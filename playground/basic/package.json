@@ -1,0 +1,16 @@
+{
+  "name": "xanto-playground",
+  "license": "MIT",
+  "author": "Xanto.JS",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "xanto": "file:../.."
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "tsx": "^4.19.0"
+  }
+}

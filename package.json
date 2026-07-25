@@ -6,8 +6,8 @@
   "author": "Xanto.JS",
   "type": "module",
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "test": "vitest",
     "test:watch": "vitest --watch"
   },
@@ -22,7 +22,6 @@
   ],
   "devDependencies": {
     "@types/node": "^26.1.1",
-    "tsup": "^8.5.1",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   },
