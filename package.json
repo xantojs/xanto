@@ -1,0 +1,55 @@
+{
+  "name": "xanto",
+  "version": "0.0.1",
+  "description": "A modern backend framework for Node.js, Bun and Deno",
+  "license": "MIT",
+  "author": "Xanto.JS",
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "h3": "^2.0.1-rc.26",
+    "tinyglobby": "^0.2.17"
+  },
+  "engines": {
+    "node": ">=22",
+    "bun": ">=1.2",
+    "deno": ">=2.0"
+  },
+  "private": false,
+  "keywords": [
+    "framework",
+    "backend",
+    "typescript",
+    "node",
+    "bun",
+    "deno"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xantojs/xanto.git"
+  },
+  "homepage": "https://github.com/xantojs/xanto",
+  "bugs": {
+    "url": "https://github.com/xantojs/xanto/issues"
+  }
+}
