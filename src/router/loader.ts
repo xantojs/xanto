@@ -1,32 +1,20 @@
-import { glob } from 'tinyglobby'
 import { join } from 'pathe'
 import { pathToFileURL } from 'node:url'
 
-export async function loadFiles() {
-  //@ts-ignore
-  const projectRoot =
-    typeof globalThis !== 'undefined' && (globalThis as any).Deno?.cwd
-      ? (globalThis as any).Deno.cwd()
-      : typeof process !== 'undefined'
-        ? process.cwd()
-        : '.'
+import { getProjectRoot } from './utils/runtime.js'
 
+import { scanRouteFiles } from './scanner.js'
+
+export async function loadFiles(routesDir: string = 'routes') {
+  const projectRoot = getProjectRoot()
   const entryDir = join(projectRoot, 'src')
 
-  const files = await glob('routes/**/*.ts', {
-    cwd: entryDir,
-    absolute: true,
-  })
+  const files = await scanRouteFiles(routesDir, entryDir)
 
-  if (files.length === 0) {
-    console.error(`No route files found in: ${join(entryDir, 'routes')}`)
-    return
-  }
+  if (files.length === 0) return
 
   const firstFile = files[0]!
-
   const fileUrl = pathToFileURL(firstFile).href
-
   const module = await import(fileUrl)
 
   console.log('Successfully loaded route:', module.default)

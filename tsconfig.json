@@ -6,9 +6,8 @@
 
     "lib": ["ES2024"],
 
-    "types": ["node"],
+    "types": ["node", "bun-types", "@types/deno"],
 
-   
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,

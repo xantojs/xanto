@@ -6,16 +6,21 @@ export interface App {
   start(options?: number | ServerOptions): Promise<ReturnType<typeof createServer>>
 }
 
-export function createApp(): App {
+export interface XantoAppOptions {
+  routes?: string
+}
+
+export function createApp(appOptions?: XantoAppOptions): App {
   const h3 = new H3()
 
   const app = {
-    async start(options?: number | ServerOptions) {
-      const opts = typeof options === 'number' ? { port: options } : options
-      await loadFiles()
+    async start(serverOptions?: number | ServerOptions) {
+      const opts = typeof serverOptions === 'number' ? { port: serverOptions } : serverOptions
+      await loadFiles(appOptions?.routes)
       return createServer(h3, opts)
     },
   }
 
   return app
 }
+  
