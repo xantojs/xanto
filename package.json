@@ -14,15 +14,19 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./routing": {
       "types": "./dist/xanto.routing/index.d.ts",
-      "import": "./dist/xanto.routing/index.js"
+      "import": "./dist/xanto.routing/index.js",
+      "default": "./dist/xanto.routing/index.js"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "devDependencies": {
     "@types/node": "^26.1.1",
@@ -30,10 +34,10 @@
     "vitest": "^4.1.10"
   },
   "dependencies": {
-    "h3": "^2.0.1-rc.26",
-    "pathe": "^2.0.3",
-    "std-env": "^4.2.0",
-    "tinyglobby": "^0.2.17"
+    "h3": "2.0.1-rc.26",
+    "pathe": "2.0.3",
+    "std-env": "4.2.0",
+    "tinyglobby": "0.2.17"
   },
   "engines": {
     "node": ">=22",
