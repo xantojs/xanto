@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/main.ts",
-    "dev:bun": "bun run src/main.ts"
+    "dev:bun": "bun run src/main.ts",
+    "dev:deno": "deno run -A src/main.ts"
   },
   "dependencies": {
     "xanto": "file:../.."

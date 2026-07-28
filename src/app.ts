@@ -7,7 +7,8 @@ export interface App {
 }
 
 export interface XantoAppOptions {
-  routes?: string
+  routesDir?: string
+  basePath?: string
 }
 
 export function createApp(appOptions?: XantoAppOptions): App {
@@ -16,11 +17,10 @@ export function createApp(appOptions?: XantoAppOptions): App {
   const app = {
     async start(serverOptions?: number | ServerOptions) {
       const opts = typeof serverOptions === 'number' ? { port: serverOptions } : serverOptions
-      await loadFiles(appOptions?.routes)
+      await loadFiles(appOptions?.routesDir, appOptions?.basePath)
       return createServer(h3, opts)
     },
   }
 
   return app
 }
-  
