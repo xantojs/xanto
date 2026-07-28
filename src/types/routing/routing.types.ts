@@ -11,3 +11,7 @@ export interface Route {
   method: Methods
   handler: XantoEventHandler
 }
+
+export interface ParsedRoute extends Route {
+  path: string
+}
