@@ -4,7 +4,8 @@
   "author": "Xanto.JS",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/main.ts"
+    "dev": "tsx src/main.ts",
+    "dev:bun": "bun run src/main.ts"
   },
   "dependencies": {
     "xanto": "file:../.."
