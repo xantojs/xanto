@@ -1,9 +1,9 @@
 import { basename, dirname, relative } from 'pathe'
 
+import { HTTP_METHODS } from './const/httpMethods.const.js'
+
 import type { ParsedRoute } from '../types/routing/routing.types.js'
 import type { Methods } from '../types/routing/methods.type.js'
-
-const HTTP_METHODS: Methods[] = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS']
 
 function extractMethod(filename: string): Methods | null {
   const nameWithoutExt = filename.replace(/\.ts$/, '')
