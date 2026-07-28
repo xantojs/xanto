@@ -1,6 +1,6 @@
 import { join } from 'pathe'
 
-import { getProjectRoot } from './utils/runtime.js'
+import { getProjectRoot } from './utils/runtime.util.js'
 
 import { scanRouteFiles } from './scanner.js'
 import { importModules } from './importer.js'

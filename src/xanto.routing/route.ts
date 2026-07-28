@@ -1,7 +1,7 @@
-import type {  EventHandler } from './routing.type.js'
-import type { Route, Methods } from './routing.type.js'
+import type { Methods } from '../types/routing/methods.type.js'
+import type { Route, XantoEventHandler } from '../types/routing/routing.types.js'
 
-export function createRoute(method: Methods, handler: EventHandler): Route {
+export function createRoute(method: Methods, handler: XantoEventHandler): Route {
   return {
     method,
     handler,

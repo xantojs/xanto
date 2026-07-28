@@ -1,5 +1,5 @@
 import { createRoute } from './route.js'
-import type { RouteOptions } from './routing.type.js'
+import type { RouteOptions } from '../types/routing/routing.types.js'
 
 export function GET(options: RouteOptions) {
   return createRoute('GET', options.handler)

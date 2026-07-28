@@ -1,10 +1,6 @@
 import { pathToFileURL } from 'node:url'
 
-export interface ImporterModule {
-  file: string
-  module: any
-  error?: Error
-}
+import type { ImporterModule } from '../types/importerModule.type.js'
 
 export async function importModules(files: string[]): Promise<ImporterModule[]> {
   const results: ImporterModule[] = []
