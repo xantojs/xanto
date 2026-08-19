@@ -26,8 +26,6 @@ export async function loadFiles(routesDir: string = 'routes', basePath: string =
 
   const methodMap = new Map<string, Methods>(validRoutes.map(({ file, method }) => [file, method]))
 
-  console.log(validRoutes)
-
   const imported = await importModules(validRoutes.map(({ file }) => file))
 
   const routes = imported

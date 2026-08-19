@@ -1,6 +1,6 @@
 import { H3 } from 'h3'
 import { createServer } from './server.js'
-import { loadFiles } from './router/loader.js'
+import { loadFiles } from './scan/loader.js'
 
 import type { ServerOptions } from './types/serverOptions.type.js'
 import type { App, XantoAppOptions } from './types/app.types.js'

@@ -1,4 +1,4 @@
-import { basename, dirname, relative } from 'pathe'
+import { dirname, relative } from 'pathe'
 
 import type { ParsedRoute } from '../types/routing/routing.types.js'
 import type { Methods } from '../types/routing/methods.type.js'
