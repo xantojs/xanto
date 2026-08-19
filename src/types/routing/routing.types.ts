@@ -15,3 +15,4 @@ export interface Route {
 export interface ParsedRoute extends Route {
   path: string
 }
+  
