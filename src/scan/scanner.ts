@@ -1,11 +1,25 @@
 import { glob } from 'tinyglobby'
-import { join } from 'pathe'
+
+import { HTTP_METHODS } from './const/httpMethods.const.js'
+
+const METHODS_GLOB = `{${HTTP_METHODS.map((m) => m.toLowerCase()).join(',')}}`
+const EXTENSIONS_GLOB = `{ts,js,mts,mjs}`
 
 export async function scanFiles(scanDir: string, entryDir: string): Promise<string[]> {
-  const files = await glob(`${scanDir}/**/*.ts`, {
-    cwd: entryDir,
-    absolute: true,
-  })
-
-  return files
+  return glob(
+    [
+      `${scanDir}/**/*.${METHODS_GLOB}.${EXTENSIONS_GLOB}`,
+      `${scanDir}/**/${METHODS_GLOB}.${EXTENSIONS_GLOB}`,
+      `${scanDir}/**/*.middleware.${EXTENSIONS_GLOB}`,
+      `${scanDir}/**/middleware.${EXTENSIONS_GLOB}`,
+      `${scanDir}/**/*.error.${EXTENSIONS_GLOB}`,
+      `${scanDir}/**/error.${EXTENSIONS_GLOB}`,
+    ],
+    {
+      cwd: entryDir,
+      absolute: true,
+      onlyFiles: true,
+      ignore: ['**/node_modules/**', '**/.git/**', '**/_**/**', '**/*.d.ts', '**/*.{test,spec}.*'],
+    }
+  )
 }
