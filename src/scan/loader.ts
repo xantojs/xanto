@@ -15,7 +15,10 @@ export async function loadFiles(routesDir: string = 'routes', basePath: string =
   const routesRoot = join(entryDir, routesDir)
 
   const files = await scanFiles(routesDir, entryDir)
-  if (files.length === 0) return
+  if (files.length === 0) {
+    console.error(`No route files found in: ${join(entryDir, routesDir)}`)
+    return
+  }
 
   const validRoutes = files.flatMap((file) => {
     const method = extractMethod(basename(file))
@@ -33,9 +36,7 @@ export async function loadFiles(routesDir: string = 'routes', basePath: string =
     .flatMap(({ file, module }) => {
       const method = methodMap.get(file)!
 
-      if (!method) {
-        return []
-      }
+      if (!method) return []
 
       const route = parseRoute(file, routesRoot, method, module)
 

@@ -7,10 +7,5 @@ export async function scanFiles(scanDir: string, entryDir: string): Promise<stri
     absolute: true,
   })
 
-  if (files.length === 0) {
-    console.error(`No route files found in: ${join(entryDir, scanDir)}`)
-    return []
-  }
-
   return files
 }
