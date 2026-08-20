@@ -18,9 +18,9 @@
       "default": "./dist/index.js"
     },
     "./routing": {
-      "types": "./dist/xanto.routing/index.d.ts",
-      "import": "./dist/xanto.routing/index.js",
-      "default": "./dist/xanto.routing/index.js"
+      "types": "./dist/server/routing/index.d.ts",
+      "import": "./dist/server/routing/index.js",
+      "default": "./dist/server/routing/index.js"
     }
   },
   "files": [

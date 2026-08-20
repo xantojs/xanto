@@ -1,4 +1,4 @@
-import { createServer } from '../server.js'
+import type { createServer } from '../server/server.js'
 
 import type { ServerOptions } from './serverOptions.type.js'
 
