@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'node:url'
 
-import type { ImporterModule } from '../types/importerModule.type.js'
+import type { ImporterModule } from './types/importerModule.type.js'
 
 export async function importModules(files: string[]): Promise<ImporterModule[]> {
   const results: ImporterModule[] = []

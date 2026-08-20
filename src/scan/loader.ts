@@ -7,7 +7,7 @@ import { parseRoute } from './parser.js'
 import { getProjectRoot } from './utils/runtime.util.js'
 import { extractMethod } from './utils/extractor.util.js'
 
-import type { Methods } from '../types/routing/methods.type.js'
+import type { Methods } from '../types/methods.type.js'
 
 export async function loadFiles(routesDir: string = 'routes', basePath: string = 'src') {
   const projectRoot = getProjectRoot()

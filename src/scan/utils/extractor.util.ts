@@ -1,6 +1,6 @@
 import { HTTP_METHODS } from '../const/httpMethods.const.js'
 
-import type { Methods } from '../../types/routing/methods.type.js'
+import type { Methods } from '../../types/methods.type.js'
 
 export function extractMethod(filename: string): Methods | null {
   const nameWithoutExt = filename.replace(/\.ts$/, '')

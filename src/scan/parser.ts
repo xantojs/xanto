@@ -1,7 +1,7 @@
 import { dirname, relative } from 'pathe'
 
-import type { ParsedRoute } from '../types/routing/routing.types.js'
-import type { Methods } from '../types/routing/methods.type.js'
+import type { ParsedRoute } from '../server/types/routing.types.js'
+import type { Methods } from '../types/methods.type.js'
 
 function pathToDynamicSegments(path: string) {
   return path.replace(/\[([^\]]+)\]/g, ':$1')
