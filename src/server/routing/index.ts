@@ -1,3 +1,2 @@
 export { GET, POST } from './methods.js'
-export { createRoute } from './route.js'
-export type { Route, RouteOptions, ParsedRoute } from '../types/routing.types.js'
+export type { SafeRouteOptions, BodyRouteOptions, SafeHandler, BodyHandler } from '../types/routing.types.js'

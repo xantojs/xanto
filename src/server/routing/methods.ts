@@ -1,10 +1,14 @@
 import { createRoute } from './route.js'
-import type { RouteOptions } from '../types/routing.types.js'
+import type { Route, RouteSchema, SafeRouteOptions, BodyRouteOptions } from '../types/routing.types.js'
 
-export function GET(options: RouteOptions) {
-  return createRoute('GET', options.handler)
+export function GET<TState extends object = Record<string, unknown>, TSchema extends RouteSchema = RouteSchema>(
+  options: SafeRouteOptions<TSchema, TState>
+): Route {
+  return createRoute('GET', options as any)
 }
 
-export function POST(options: RouteOptions) {
-  return createRoute('POST', options.handler)
+export function POST<TState extends object = Record<string, unknown>, TSchema extends RouteSchema = RouteSchema>(
+  options: BodyRouteOptions<TSchema, TState>
+): Route {
+  return createRoute('POST', options as any)
 }
