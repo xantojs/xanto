@@ -1,4 +1,5 @@
 import { GET } from 'xanto/routing'
+import { HttpStatus } from 'xanto'
 
 interface Users {
   name: string
@@ -12,7 +13,7 @@ interface MyState {
 
 export default GET<MyState>({
   handler(ctx) {
-    ctx.status(201)
+    ctx.status(HttpStatus.Ok)
 
     ctx.state.set('userId', 213123)
 
