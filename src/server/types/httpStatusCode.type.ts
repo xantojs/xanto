@@ -39,3 +39,4 @@ export type HttpStatusCode =
   | RedirectStatus
   | ClientErrorStatus
   | ServerErrorStatus
+  | (number & {})
