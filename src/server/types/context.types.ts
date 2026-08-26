@@ -2,6 +2,7 @@ import type { H3Event } from 'h3'
 import type { Methods } from '../../types/methods.type.js'
 import type { StateManager } from './stateManager.type.js'
 import type { CookieOptions } from './cookieOptions.type.js'
+import type { HttpStatusCode } from './httpStatusCode.type.js'
 
 export interface BaseContext<
   TParams extends Record<string, unknown> = Record<string, unknown>,
@@ -18,7 +19,7 @@ export interface BaseContext<
   readonly ip?: string | undefined
   readonly raw: H3Event
 
-  status(code: number): this
+  status(code: HttpStatusCode): this
   setHeader(name: string, value: string | number | readonly string[]): this
   getHeader(name: string): string | undefined
   getCookie(name: string): string | undefined
