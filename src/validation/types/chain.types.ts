@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from './schema.types.js'
+import type { StandardSchemaV1, InferInput, InferOutput } from './schema.types.js'
 
 export interface XantoSchema<Input = unknown, Output = Input> extends StandardSchemaV1<Input, Output> {
   optional(): XantoSchema<Input | undefined, Output | undefined>
@@ -30,8 +30,30 @@ export interface XantoBooleanSchema extends XantoSchema<boolean, boolean> {
   coerce(): Omit<XantoBooleanSchema, 'coerce'>
 }
 
+export interface XantoDateSchema extends XantoSchema<Date | string, Date> {
+  min(date: Date, message?: string): XantoDateSchema
+  max(date: Date, message?: string): XantoDateSchema
+  coerce(): Omit<XantoDateSchema, 'coerce'>
+}
+
 export interface XantoArraySchema<ItemInput, ItemOutput> extends XantoSchema<ItemInput[], ItemOutput[]> {
   min(length: number, message?: string): Omit<XantoArraySchema<ItemInput, ItemOutput>, 'length'>
   max(length: number, message?: string): Omit<XantoArraySchema<ItemInput, ItemOutput>, 'length'>
   length(length: number, message?: string): Omit<XantoArraySchema<ItemInput, ItemOutput>, 'min' | 'max' | 'length'>
+}
+
+export interface XantoEnumSchema<T extends readonly string[]> extends XantoSchema<T[number], T[number]> {
+  readonly options: T
+}
+
+export interface XantoLiteralSchema<T extends string | number | boolean> extends XantoSchema<T, T> {
+  readonly literalValue: T
+}
+
+export type InferUnionInput<T extends readonly StandardSchemaV1<any, any>[]> = InferInput<T[number]>
+export type InferUnionOutput<T extends readonly StandardSchemaV1<any, any>[]> = InferOutput<T[number]>
+
+export interface XantoUnionSchema<T extends readonly StandardSchemaV1<any, any>[]>
+  extends XantoSchema<InferUnionInput<T>, InferUnionOutput<T>> {
+  readonly options: T
 }
