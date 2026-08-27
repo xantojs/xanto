@@ -35,9 +35,7 @@ export interface SafeContext<
   TQuery extends Record<string, unknown> = Record<string, unknown>,
   THeaders extends Record<string, string | undefined> = Record<string, string | undefined>,
   TState extends object = Record<string, unknown>,
-> extends BaseContext<TParams, TQuery, THeaders, TState> {
-  readonly body?: never
-}
+> extends BaseContext<TParams, TQuery, THeaders, TState> {}
 
 export interface BodyContext<
   TBody = unknown,
