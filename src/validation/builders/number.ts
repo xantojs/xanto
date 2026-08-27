@@ -4,44 +4,100 @@ import {
   minValue,
   maxValue,
   integer as vInteger,
-  optional as vOptional,
   transform,
-  type BaseSchema,
+  unknown as vUnknown,
+  safeParse,
   type PipeAction,
+  type BaseSchema,
 } from 'valibot'
-import { wrapSchema } from '../utils/wrap.util.js'
-import type { NumberOptions } from '../types/options.type.js'
-import type { StandardSchemaV1 } from '../types/schema.type.js'
+import type { XantoNumberSchema } from '../types/chain.types.js'
+import type { StandardResult } from '../types/schema.types.js'
 
-export function number(options?: NumberOptions): StandardSchemaV1<number, number> {
+export function number(message?: string): XantoNumberSchema {
   const actions: PipeAction<number, number, any>[] = []
+  let isCoerce = false
+  let defaultValue: number | undefined = undefined
+  let isOptional = false
 
-  if (options?.min !== undefined) {
-    actions.push(minValue(options.min, typeof options.message === 'string' ? options.message : undefined))
+  function validate(value: unknown): StandardResult<number> {
+    if (value === undefined && isOptional) {
+      return { value: defaultValue as any }
+    }
+
+    let valibotSchema: BaseSchema<any, any, any>
+
+    if (isCoerce) {
+      valibotSchema = (pipe as any)(
+        vUnknown(),
+        transform((val: unknown) => {
+          if (typeof val === 'string' && val.trim() !== '') {
+            const num = Number(val)
+            return isNaN(num) ? val : num
+          }
+          return val
+        }),
+        vNumber(message),
+        ...actions
+      )
+    } else {
+      valibotSchema = actions.length > 0 ? (pipe as any)(vNumber(message), ...actions) : vNumber(message)
+    }
+
+    const result = safeParse(valibotSchema, value)
+
+    if (result.success) {
+      return { value: result.output }
+    }
+
+    return {
+      issues: result.issues.map((issue) => ({
+        message: issue.message,
+        path: issue.path?.map((item: any) => item.key as string | number),
+      })),
+    }
   }
 
-  if (options?.max !== undefined) {
-    actions.push(maxValue(options.max, typeof options.message === 'string' ? options.message : undefined))
+  const schema: XantoNumberSchema = {
+    '~standard': {
+      version: 1,
+      vendor: 'xanto',
+      validate,
+      types: {
+        input: undefined as unknown as number,
+        output: undefined as unknown as number,
+      },
+    },
+
+    min(val: number, msg?: string) {
+      actions.push(minValue(val, msg))
+      return schema
+    },
+
+    max(val: number, msg?: string) {
+      actions.push(maxValue(val, msg))
+      return schema
+    },
+
+    integer(msg?: string) {
+      actions.push(vInteger(msg))
+      return schema
+    },
+
+    coerce() {
+      isCoerce = true
+      return schema
+    },
+
+    optional(def?: any) {
+      isOptional = true
+      if (def !== undefined) defaultValue = def
+      return schema as any
+    },
+
+    default(def: any) {
+      return schema.optional(def)
+    },
   }
 
-  if (options?.integer) {
-    actions.push(vInteger(typeof options.message === 'string' ? options.message : undefined))
-  }
-
-  let baseSchema: BaseSchema<any, any, any> = vNumber(options?.message)
-
-  if (options?.coerce) {
-    baseSchema = pipe(
-      baseSchema,
-      transform((val: unknown) => (typeof val === 'string' ? Number(val) : val))
-    )
-  }
-
-  let schema: BaseSchema<any, any, any> = actions.length > 0 ? (pipe as any)(baseSchema, ...actions) : baseSchema
-
-  if (options?.default !== undefined) {
-    schema = vOptional(schema, options.default)
-  }
-
-  return wrapSchema(schema)
+  return schema
 }

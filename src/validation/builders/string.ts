@@ -8,53 +8,93 @@ import {
   url as vUrl,
   uuid as vUuid,
   regex as vRegex,
-  optional as vOptional,
-  type BaseSchema,
+  safeParse,
   type PipeAction,
 } from 'valibot'
-import { wrapSchema } from '../utils/wrap.util.js'
-import type { StringOptions } from '../types/options.type.js'
-import type { StandardSchemaV1 } from '../types/schema.type.js'
+import type { XantoStringSchema } from '../types/chain.types.js'
+import type { StandardResult } from '../types/schema.types.js'
 
-export function string(options?: StringOptions): StandardSchemaV1<string, string> {
+export function string(message?: string): XantoStringSchema {
   const actions: PipeAction<string, string, any>[] = []
+  let defaultValue: string | undefined = undefined
+  let isOptional = false
 
-  if (options?.min !== undefined) {
-    actions.push(minLength(options.min, typeof options.message === 'string' ? options.message : undefined))
+  function validate(value: unknown): StandardResult<string> {
+    if (value === undefined && isOptional) {
+      return { value: defaultValue as any }
+    }
+
+    const valibotSchema = actions.length > 0 ? (pipe as any)(vString(message), ...actions) : vString(message)
+    const result = safeParse(valibotSchema, value)
+
+    if (result.success) {
+      return { value: result.output }
+    }
+
+    return {
+      issues: result.issues.map((issue) => ({
+        message: issue.message,
+        path: issue.path?.map((item: any) => item.key as string | number),
+      })),
+    }
   }
 
-  if (options?.max !== undefined) {
-    actions.push(maxLength(options.max, typeof options.message === 'string' ? options.message : undefined))
+  const schema: XantoStringSchema = {
+    '~standard': {
+      version: 1,
+      vendor: 'xanto',
+      validate,
+      types: {
+        input: undefined as unknown as string,
+        output: undefined as unknown as string,
+      },
+    },
+
+    min(len: number, msg?: string) {
+      actions.push(minLength(len, msg))
+      return schema as any
+    },
+
+    max(len: number, msg?: string) {
+      actions.push(maxLength(len, msg))
+      return schema as any
+    },
+
+    length(len: number, msg?: string) {
+      actions.push(vLength(len, msg))
+      return schema as any
+    },
+
+    email(msg?: string) {
+      actions.push(vEmail(msg))
+      return schema as any
+    },
+
+    url(msg?: string) {
+      actions.push(vUrl(msg))
+      return schema as any
+    },
+
+    uuid(msg?: string) {
+      actions.push(vUuid(msg))
+      return schema as any
+    },
+
+    regex(pattern: RegExp, msg?: string) {
+      actions.push(vRegex(pattern, msg))
+      return schema
+    },
+
+    optional(def?: any) {
+      isOptional = true
+      if (def !== undefined) defaultValue = def
+      return schema as any
+    },
+
+    default(def: any) {
+      return schema.optional(def)
+    },
   }
 
-  if (options?.length !== undefined) {
-    actions.push(vLength(options.length, typeof options.message === 'string' ? options.message : undefined))
-  }
-
-  if (options?.email) {
-    const msg = typeof options.email === 'string' ? options.email : options.message
-    actions.push(vEmail(typeof msg === 'string' ? msg : undefined))
-  }
-
-  if (options?.url) {
-    const msg = typeof options.url === 'string' ? options.url : options.message
-    actions.push(vUrl(typeof msg === 'string' ? msg : undefined))
-  }
-
-  if (options?.uuid) {
-    const msg = typeof options.uuid === 'string' ? options.uuid : options.message
-    actions.push(vUuid(typeof msg === 'string' ? msg : undefined))
-  }
-
-  if (options?.regex) {
-    actions.push(vRegex(options.regex, typeof options.message === 'string' ? options.message : undefined))
-  }
-
-  let schema: BaseSchema<any, any, any> = actions.length > 0 ? (pipe as any)(vString(options?.message), ...actions) : vString(options?.message)
-
-  if (options?.default !== undefined) {
-    schema = vOptional(schema, options.default)
-  }
-
-  return wrapSchema(schema)
+  return schema
 }

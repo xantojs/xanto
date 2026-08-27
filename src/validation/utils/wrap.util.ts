@@ -1,5 +1,5 @@
 import { type BaseSchema, type BaseIssue, safeParse } from 'valibot'
-import type { StandardSchemaV1, StandardResult } from '../types/schema.type.js'
+import type { StandardSchemaV1, StandardResult } from '../types/schema.types.js'
 
 export function wrapSchema<Input, Output>(
   schema: BaseSchema<Input, Output, BaseIssue<unknown>>
