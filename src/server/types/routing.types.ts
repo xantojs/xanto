@@ -1,36 +1,30 @@
 import type { H3Event } from 'h3'
 import type { Methods } from '../../types/methods.type.js'
 import type { SafeContext, BodyContext } from './context.types.js'
+import type { RouteSchema, SafeRouteSchema, BodyRouteSchema, InferSchema, InferHeadersSchema, InferBodySchema } from './schema.types.js'
 
-export interface RouteSchema {
-  params?: any
-  query?: any
-  headers?: any
-  body?: any
-}
+export type { RouteSchema, SafeRouteSchema, BodyRouteSchema, InferSchema, InferHeadersSchema, InferBodySchema }
 
-export type InferSchema<T> = T extends { _output: infer O } ? O : T extends { _type: infer O } ? O : T
-
-export type SafeHandler<TSchema extends RouteSchema, TState extends object> = (
-  ctx: SafeContext<InferSchema<TSchema['params']>, InferSchema<TSchema['query']>, InferSchema<TSchema['headers']>, TState>
+export type SafeHandler<TSchema extends SafeRouteSchema, TState extends object> = (
+  ctx: SafeContext<InferSchema<TSchema['params']>, InferSchema<TSchema['query']>, InferHeadersSchema<TSchema['headers']>, TState>
 ) => Promise<unknown> | unknown
 
-export type BodyHandler<TSchema extends RouteSchema, TState extends object> = (
+export type BodyHandler<TSchema extends BodyRouteSchema, TState extends object> = (
   ctx: BodyContext<
-    InferSchema<TSchema['body']>,
+    InferBodySchema<TSchema['body']>,
     InferSchema<TSchema['params']>,
     InferSchema<TSchema['query']>,
-    InferSchema<TSchema['headers']>,
+    InferHeadersSchema<TSchema['headers']>,
     TState
   >
 ) => Promise<unknown> | unknown
 
-export interface SafeRouteOptions<TSchema extends RouteSchema = RouteSchema, TState extends object = Record<string, unknown>> {
+export interface SafeRouteOptions<TSchema extends SafeRouteSchema = SafeRouteSchema, TState extends object = Record<string, unknown>> {
   schema?: TSchema | undefined
   handler: SafeHandler<TSchema, TState>
 }
 
-export interface BodyRouteOptions<TSchema extends RouteSchema = RouteSchema, TState extends object = Record<string, unknown>> {
+export interface BodyRouteOptions<TSchema extends BodyRouteSchema = BodyRouteSchema, TState extends object = Record<string, unknown>> {
   schema?: TSchema | undefined
   handler: BodyHandler<TSchema, TState>
 }
@@ -44,3 +38,4 @@ export interface Route {
 export interface ParsedRoute extends Route {
   path: string
 }
+
