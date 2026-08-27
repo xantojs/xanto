@@ -1,5 +1,5 @@
 {
-  "name": "xanto",
+  "name": "@xanto/core",
   "version": "0.0.1",
   "description": "A modern backend framework for Node.js, Bun and Deno",
   "license": "MIT",

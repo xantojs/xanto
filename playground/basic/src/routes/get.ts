@@ -1,5 +1,5 @@
-import { GET } from 'xanto/routing'
-import { HttpStatus } from 'xanto'
+import { GET } from '@xanto/core/routing'
+import { HttpStatus } from '@xanto/core'
 
 interface Users {
   name: string

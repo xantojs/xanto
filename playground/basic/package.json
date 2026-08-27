@@ -9,7 +9,7 @@
     "dev:deno": "deno run -A src/main.ts"
   },
   "dependencies": {
-    "xanto": "file:../.."
+    "@xanto/core": "file:../.."
   },
   "devDependencies": {
     "typescript": "^7.0.2",
