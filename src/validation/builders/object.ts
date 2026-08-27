@@ -1,25 +1,7 @@
-import type { StandardSchemaV1, StandardResult, InferInput, InferOutput } from '../types/schema.types.js'
-import type { XantoSchema } from '../types/chain.types.js'
+import type { StandardResult } from '../types/schema.types.js'
+import type { ObjectShape, InferObjectInput, InferObjectOutput, XantoObjectSchema } from '../types/chain.types.js'
 
-export type ObjectShape = Record<string, StandardSchemaV1<any, any>>
-
-export type InferObjectInput<T extends ObjectShape> = {
-  [K in keyof T]: InferInput<T[K]>
-}
-
-export type InferObjectOutput<T extends ObjectShape> = {
-  [K in keyof T]: InferOutput<T[K]>
-}
-
-export interface XantoObjectSchema<Shape extends ObjectShape>
-  extends XantoSchema<InferObjectInput<Shape>, InferObjectOutput<Shape>> {
-  readonly shape: Shape
-}
-
-export function object<Shape extends ObjectShape>(
-  shape: Shape,
-  message?: string
-): XantoObjectSchema<Shape> {
+export function object<Shape extends ObjectShape>(shape: Shape, message?: string): XantoObjectSchema<Shape> {
   let defaultValue: InferObjectOutput<Shape> | undefined = undefined
   let isOptional = false
 
