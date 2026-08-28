@@ -1,4 +1,4 @@
-import type { StandardSchemaV1, StandardResult } from '../types/schema.types.js'
+import type { StandardSchemaV1, StandardResult, StandardIssue } from '../types/schema.types.js'
 import type { XantoUnionSchema, InferUnionInput, InferUnionOutput } from '../types/chain.types.js'
 
 export function union<const T extends readonly StandardSchemaV1<any, any>[]>(options: T, message?: string): XantoUnionSchema<T> {
@@ -10,7 +10,7 @@ export function union<const T extends readonly StandardSchemaV1<any, any>[]>(opt
       return { value: defaultValue as any }
     }
 
-    const allIssues: { message: string; path?: readonly (string | number | symbol)[] | undefined }[] = []
+    const allIssues: StandardIssue[] = []
 
     for (const schema of options) {
       const result = await schema['~standard'].validate(value)
