@@ -1,4 +1,4 @@
-import type { StandardSchemaV1, StandardResult } from '../types/schema.types.js'
+import type { StandardSchemaV1, StandardResult } from '../../types/schema.types.js'
 import type { XantoSchema } from '../types/chain.types.js'
 
 export function createBaseChain<Input, Output>(

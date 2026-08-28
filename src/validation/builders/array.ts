@@ -1,4 +1,4 @@
-import type { StandardSchemaV1, StandardResult, InferInput, InferOutput } from '../types/schema.types.js'
+import type { StandardSchemaV1, StandardResult, InferInput, InferOutput } from '../../types/schema.types.js'
 import type { XantoArraySchema } from '../types/chain.types.js'
 
 export function array<ItemSchema extends StandardSchemaV1<any, any>>(

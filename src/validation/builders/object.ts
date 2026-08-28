@@ -1,4 +1,4 @@
-import type { StandardResult } from '../types/schema.types.js'
+import type { StandardResult } from '../../types/schema.types.js'
 import type { ObjectShape, InferObjectInput, InferObjectOutput, XantoObjectSchema } from '../types/chain.types.js'
 
 export function object<Shape extends ObjectShape>(shape: Shape, message?: string): XantoObjectSchema<Shape> {

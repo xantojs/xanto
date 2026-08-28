@@ -1,4 +1,4 @@
-import type { StandardSchemaV1, InferInput, InferOutput } from './schema.types.js'
+import type { StandardSchemaV1, InferInput, InferOutput } from '../../types/schema.types.js'
 
 export interface XantoSchema<Input = unknown, Output = Input> extends StandardSchemaV1<Input, Output> {
   optional(): XantoSchema<Input | undefined, Output | undefined>

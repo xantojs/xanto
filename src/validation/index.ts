@@ -7,7 +7,7 @@ export type {
   InferOutput,
   StandardResult,
   StandardIssue,
-} from './types/schema.types.js'
+} from '../types/schema.types.js'
 export type {
   XantoSchema,
   XantoStringSchema,

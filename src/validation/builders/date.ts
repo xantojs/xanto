@@ -10,7 +10,7 @@ import {
   type BaseSchema,
 } from 'valibot'
 import type { XantoDateSchema } from '../types/chain.types.js'
-import type { StandardResult } from '../types/schema.types.js'
+import type { StandardResult } from '../../types/schema.types.js'
 
 export function date(message?: string): XantoDateSchema {
   const actions: PipeAction<Date, Date, any>[] = []

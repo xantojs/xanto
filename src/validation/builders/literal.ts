@@ -1,14 +1,8 @@
-import {
-  literal as vLiteral,
-  safeParse,
-} from 'valibot'
+import { literal as vLiteral, safeParse } from 'valibot'
 import type { XantoLiteralSchema } from '../types/chain.types.js'
-import type { StandardResult } from '../types/schema.types.js'
+import type { StandardResult } from '../../types/schema.types.js'
 
-export function literal<const T extends string | number | boolean>(
-  expectedValue: T,
-  message?: string
-): XantoLiteralSchema<T> {
+export function literal<const T extends string | number | boolean>(expectedValue: T, message?: string): XantoLiteralSchema<T> {
   let defaultValue: T | undefined = undefined
   let isOptional = false
 

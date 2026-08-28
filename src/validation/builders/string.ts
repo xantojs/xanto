@@ -12,7 +12,7 @@ import {
   type PipeAction,
 } from 'valibot'
 import type { XantoStringSchema } from '../types/chain.types.js'
-import type { StandardResult } from '../types/schema.types.js'
+import type { StandardResult } from '../../types/schema.types.js'
 
 export function string(message?: string): XantoStringSchema {
   const actions: PipeAction<string, string, any>[] = []

@@ -1,14 +1,8 @@
-import {
-  picklist,
-  safeParse,
-} from 'valibot'
+import { picklist, safeParse } from 'valibot'
 import type { XantoEnumSchema } from '../types/chain.types.js'
-import type { StandardResult } from '../types/schema.types.js'
+import type { StandardResult } from '../../types/schema.types.js'
 
-export function enumType<const T extends readonly string[]>(
-  options: T,
-  message?: string
-): XantoEnumSchema<T> {
+export function enumType<const T extends readonly string[]>(options: T, message?: string): XantoEnumSchema<T> {
   let defaultValue: T[number] | undefined = undefined
   let isOptional = false
 

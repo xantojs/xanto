@@ -1,13 +1,6 @@
-import {
-  boolean as vBoolean,
-  pipe,
-  transform,
-  unknown as vUnknown,
-  safeParse,
-  type BaseSchema,
-} from 'valibot'
+import { boolean as vBoolean, pipe, transform, unknown as vUnknown, safeParse, type BaseSchema } from 'valibot'
 import type { XantoBooleanSchema } from '../types/chain.types.js'
-import type { StandardResult } from '../types/schema.types.js'
+import type { StandardResult } from '../../types/schema.types.js'
 
 export function boolean(message?: string): XantoBooleanSchema {
   let isCoerce = false
