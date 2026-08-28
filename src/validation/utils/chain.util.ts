@@ -1,5 +1,44 @@
-import type { StandardSchemaV1, StandardResult } from '../../types/schema.types.js'
+import type { PipeAction } from 'valibot'
+import type { StandardIssue, StandardResult } from '../../types/schema.types.js'
 import type { XantoSchema } from '../types/chain.types.js'
+import type { ChainState } from '../types/chainState.type.js'
+
+export function createInitialState<Output>(message?: string): ChainState<Output> {
+  return { actions: [], isOptional: false, defaultValue: undefined, message }
+}
+
+export function withAction<Output>(state: ChainState<Output>, action: PipeAction<any, any, any>): ChainState<Output> {
+  return { ...state, actions: [...state.actions, action] }
+}
+
+export function createOptionalMethods<Output>(state: ChainState<Output>, factory: (state: ChainState<any>) => any) {
+  return {
+    optional<DefaultValue = undefined>(defaultValue?: DefaultValue) {
+      return factory({ ...state, isOptional: true, defaultValue }) as any
+    },
+    default<DefaultValue>(defaultValue: DefaultValue) {
+      return factory({ ...state, isOptional: true, defaultValue }) as any
+    },
+  }
+}
+
+export function toStandardResult<Output>(
+  result:
+    | { success: true; output: Output }
+    | { success: false; issues: readonly { message: string; path?: readonly { key: unknown }[] | undefined }[] }
+): StandardResult<Output> {
+  if (result.success) {
+    return { value: result.output }
+  }
+  return {
+    issues: result.issues.map(
+      (issue): StandardIssue => ({
+        message: issue.message,
+        path: issue.path?.map((item) => item.key as string | number),
+      })
+    ),
+  }
+}
 
 export function createBaseChain<Input, Output>(
   validateFn: (value: unknown) => StandardResult<Output> | Promise<StandardResult<Output>>

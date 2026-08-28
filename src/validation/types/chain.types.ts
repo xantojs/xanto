@@ -8,16 +8,23 @@ export interface XantoSchema<Input = unknown, Output = Input> extends StandardSc
 
 export type StringFormatMethods = 'email' | 'url' | 'uuid'
 
-export interface XantoStringSchema extends XantoSchema<string, string> {
-  min(length: number, message?: string): Omit<XantoStringSchema, 'length'>
-  max(length: number, message?: string): Omit<XantoStringSchema, 'length'>
-  length(length: number, message?: string): Omit<XantoStringSchema, 'min' | 'max' | 'length'>
-  regex(pattern: RegExp, message?: string): XantoStringSchema
+type StringMethods<Excluded extends string> = {
+  min(length: number, message?: string): XantoStringSchema<Excluded | 'length'>
+  max(length: number, message?: string): XantoStringSchema<Excluded | 'length'>
+  length(length: number, message?: string): XantoStringSchema<Excluded | 'min' | 'max' | 'length'>
+  regex(pattern: RegExp, message?: string): XantoStringSchema<Excluded>
 
-  email(message?: string): Omit<XantoStringSchema, StringFormatMethods>
-  url(message?: string): Omit<XantoStringSchema, StringFormatMethods>
-  uuid(message?: string): Omit<XantoStringSchema, StringFormatMethods | 'min' | 'max' | 'length'>
+  email(message?: string): XantoStringSchema<Excluded | StringFormatMethods>
+  url(message?: string): XantoStringSchema<Excluded | StringFormatMethods>
+  uuid(message?: string): XantoStringSchema<Excluded | StringFormatMethods | 'min' | 'max' | 'length'>
 }
+
+export type XantoStringSchema<Excluded extends string = never> = Omit<XantoSchema<string, string>, 'optional' | 'default'> &
+  Omit<StringMethods<Excluded>, Excluded> & {
+    optional(): XantoStringSchema<Excluded>
+    optional<D>(defaultValue: D): XantoStringSchema<Excluded>
+    default<D>(defaultValue: D): XantoStringSchema<Excluded>
+  }
 
 export interface XantoNumberSchema extends XantoSchema<number, number> {
   min(value: number, message?: string): XantoNumberSchema
