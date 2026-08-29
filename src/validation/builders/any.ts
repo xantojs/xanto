@@ -1,4 +1,4 @@
-import { createInitialState, createOptionalMethods } from '../utils/chain.util.js'
+import { createInitialState, createOptionalMethods, createStandardSchema } from '../utils/chain.util.js'
 
 import type { ChainState } from '../types/chainState.type.js'
 import type { XantoSchema } from '../types/chain.types.js'
@@ -12,16 +12,7 @@ function buildAny(state: ChainState<any>): XantoSchema<any, any> {
   }
 
   return {
-    '~standard': {
-      version: 1,
-      vendor: 'xanto',
-      validate,
-      types: {
-        input: undefined as unknown as any,
-        output: undefined as unknown as any,
-      },
-    },
-
+    ...createStandardSchema<any, any>(validate),
     ...createOptionalMethods(state, buildAny),
   }
 }
@@ -35,16 +26,7 @@ function buildUnknown(state: ChainState<unknown>): XantoSchema<unknown, unknown>
   }
 
   return {
-    '~standard': {
-      version: 1,
-      vendor: 'xanto',
-      validate,
-      types: {
-        input: undefined as unknown as unknown,
-        output: undefined as unknown as unknown,
-      },
-    },
-
+    ...createStandardSchema<unknown, unknown>(validate),
     ...createOptionalMethods(state, buildUnknown),
   }
 }

@@ -10,7 +10,13 @@ import {
   type PipeAction,
 } from 'valibot'
 
-import { createInitialState, withAction, createOptionalMethods, toStandardResult } from '../utils/chain.util.js'
+import {
+  createInitialState,
+  withAction,
+  createOptionalMethods,
+  createStandardSchema,
+  toStandardResult,
+} from '../utils/chain.util.js'
 
 import type { ChainState } from '../types/chainState.type.js'
 import type { XantoNumberSchema } from '../types/chain.types.js'
@@ -50,14 +56,10 @@ function build(state: NumberChainState): XantoNumberSchema {
   const chain = (action: PipeAction<any, any, any>) => build(withAction(state, action))
 
   return {
-    '~standard': {
-      version: 1,
-      vendor: 'xanto',
-      validate,
-      types: { input: undefined as unknown as number, output: undefined as unknown as number },
-    },
-    min: (len, msg) => chain(minValue(len, msg)) as any,
-    max: (len, msg) => chain(maxValue(len, msg)) as any,
+    ...createStandardSchema<number, number>(validate),
+
+    min: (val, msg) => chain(minValue(val, msg)) as any,
+    max: (val, msg) => chain(maxValue(val, msg)) as any,
     integer: (msg) => chain(vInteger(msg)) as any,
 
     coerce: () => build({ ...state, isCoerce: true }),

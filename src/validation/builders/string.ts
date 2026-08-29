@@ -12,7 +12,13 @@ import {
   type PipeAction,
 } from 'valibot'
 
-import { createInitialState, withAction, createOptionalMethods, toStandardResult } from '../utils/chain.util.js'
+import {
+  createInitialState,
+  withAction,
+  createOptionalMethods,
+  createStandardSchema,
+  toStandardResult,
+} from '../utils/chain.util.js'
 
 import type { ChainState } from '../types/chainState.type.js'
 import type { XantoStringSchema } from '../types/chain.types.js'
@@ -30,12 +36,7 @@ function build(state: ChainState<string>): XantoStringSchema {
   const chain = (action: PipeAction<any, any, any>) => build(withAction(state, action))
 
   return {
-    '~standard': {
-      version: 1,
-      vendor: 'xanto',
-      validate,
-      types: { input: undefined as unknown as string, output: undefined as unknown as string },
-    },
+    ...createStandardSchema<string, string>(validate),
 
     min: (len, msg) => chain(minLength(len, msg)) as any,
     max: (len, msg) => chain(maxLength(len, msg)) as any,

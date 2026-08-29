@@ -40,6 +40,22 @@ export function toStandardResult<Output>(
   }
 }
 
+export function createStandardSchema<Input, Output>(
+  validateFn: (value: unknown) => StandardResult<Output> | Promise<StandardResult<Output>>
+) {
+  return {
+    '~standard': {
+      version: 1 as const,
+      vendor: 'xanto',
+      validate: validateFn,
+      types: {
+        input: undefined as unknown as Input,
+        output: undefined as unknown as Output,
+      },
+    },
+  }
+}
+
 export function createBaseChain<Input, Output>(
   validateFn: (value: unknown) => StandardResult<Output> | Promise<StandardResult<Output>>
 ): XantoSchema<Input, Output> {
