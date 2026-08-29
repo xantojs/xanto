@@ -1,54 +1,28 @@
 import { picklist, safeParse } from 'valibot'
+
+import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createStandardSchema, toStandardResult } from '../core/standard.js'
+
+import type { ChainState } from '../types/chainState.types.js'
 import type { XantoEnumSchema } from '../types/chain.types.js'
-import type { StandardResult } from '../../types/schema.types.js'
+
+function build<const T extends readonly string[]>(options: T, state: ChainState<T[number]>): XantoEnumSchema<T> {
+  const valibotSchema = picklist(options as any, state.message)
+
+  function validate(value: unknown) {
+    if (value === undefined && state.isOptional) {
+      return { value: state.defaultValue as any }
+    }
+    return toStandardResult(safeParse(valibotSchema, value))
+  }
+
+  return {
+    options,
+    ...createStandardSchema<T[number], T[number]>(validate),
+    ...createOptionalMethods(state, (newState) => build(options, newState)),
+  }
+}
 
 export function enumType<const T extends readonly string[]>(options: T, message?: string): XantoEnumSchema<T> {
-  let defaultValue: T[number] | undefined = undefined
-  let isOptional = false
-
-  const valibotSchema = picklist(options as any, message)
-
-  function validate(value: unknown): StandardResult<T[number]> {
-    if (value === undefined && isOptional) {
-      return { value: defaultValue as any }
-    }
-
-    const result = safeParse(valibotSchema, value)
-
-    if (result.success) {
-      return { value: result.output }
-    }
-
-    return {
-      issues: result.issues.map((issue) => ({
-        message: issue.message,
-        path: issue.path?.map((item: any) => item.key as string | number),
-      })),
-    }
-  }
-
-  const schema: XantoEnumSchema<T> = {
-    options,
-    '~standard': {
-      version: 1,
-      vendor: 'xanto',
-      validate,
-      types: {
-        input: undefined as unknown as T[number],
-        output: undefined as unknown as T[number],
-      },
-    },
-
-    optional(def?: any) {
-      isOptional = true
-      if (def !== undefined) defaultValue = def
-      return schema as any
-    },
-
-    default(def: any) {
-      return schema.optional(def)
-    },
-  }
-
-  return schema
+  return build(options, createInitialState(message))
 }
