@@ -1,6 +1,7 @@
-import { createInitialState, createOptionalMethods, createStandardSchema } from '../utils/chain.util.js'
+import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createStandardSchema } from '../core/standard.js'
 
-import type { ChainState } from '../types/chainState.type.js'
+import type { ChainState } from '../types/chainState.types.js'
 import type { XantoSchema } from '../types/chain.types.js'
 
 function buildAny(state: ChainState<any>): XantoSchema<any, any> {

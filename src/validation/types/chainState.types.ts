@@ -6,3 +6,7 @@ export interface ChainState<Output> {
   readonly defaultValue: Output | undefined
   readonly message: string | undefined
 }
+
+export interface CoercibleChainState<Output> extends ChainState<Output> {
+  isCoerce?: boolean
+}

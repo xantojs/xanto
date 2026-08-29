@@ -1,7 +1,8 @@
-import { createInitialState, createOptionalMethods, createStandardSchema } from '../utils/chain.util.js'
+import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createStandardSchema } from '../core/standard.js'
 
 import type { StandardSchemaV1, StandardResult, InferInput, InferOutput } from '../../types/schema.types.js'
-import type { ChainState } from '../types/chainState.type.js'
+import type { ChainState } from '../types/chainState.types.js'
 import type { XantoArraySchema } from '../types/chain.types.js'
 
 interface ArrayChainState<T> extends ChainState<T[]> {

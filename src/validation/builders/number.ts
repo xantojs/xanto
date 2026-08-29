@@ -10,15 +10,10 @@ import {
   type PipeAction,
 } from 'valibot'
 
-import {
-  createInitialState,
-  withAction,
-  createOptionalMethods,
-  createStandardSchema,
-  toStandardResult,
-} from '../utils/chain.util.js'
+import { createInitialState, createOptionalMethods, withAction } from '../core/state.js'
+import { createStandardSchema, toStandardResult } from '../core/standard.js'
 
-import type { ChainState } from '../types/chainState.type.js'
+import type { ChainState } from '../types/chainState.types.js'
 import type { XantoNumberSchema } from '../types/chain.types.js'
 
 interface NumberChainState extends ChainState<number> {
