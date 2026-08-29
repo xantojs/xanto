@@ -1,73 +1,50 @@
 import { boolean as vBoolean, pipe, transform, unknown as vUnknown, safeParse, type BaseSchema } from 'valibot'
+
+import { createInitialState, createOptionalMethods, createStandardSchema, toStandardResult } from '../utils/chain.util.js'
+
+import type { ChainState } from '../types/chainState.type.js'
 import type { XantoBooleanSchema } from '../types/chain.types.js'
-import type { StandardResult } from '../../types/schema.types.js'
 
-export function boolean(message?: string): XantoBooleanSchema {
-  let isCoerce = false
-  let defaultValue: boolean | undefined = undefined
-  let isOptional = false
+interface BooleanChainState extends ChainState<boolean> {
+  isCoerce?: boolean
+}
 
-  function validate(value: unknown): StandardResult<boolean> {
-    if (value === undefined && isOptional) {
-      return { value: defaultValue as any }
+function build(state: BooleanChainState): XantoBooleanSchema {
+  function validate(value: unknown) {
+    if (value === undefined && state.isOptional) {
+      return { value: state.defaultValue as any }
     }
 
-    let valibotSchema: BaseSchema<any, any, any>
+    let valibotSchema: any
 
-    if (isCoerce) {
-      valibotSchema = pipe(
+    if (state.isCoerce) {
+      valibotSchema = (pipe as any)(
         vUnknown(),
         transform((val: unknown) => {
           if (val === 'true' || val === '1' || val === 1) return true
           if (val === 'false' || val === '0' || val === 0) return false
           return val
         }),
-        vBoolean(message)
+        vBoolean(state.message),
+        ...state.actions
       )
     } else {
-      valibotSchema = vBoolean(message)
+      valibotSchema =
+        state.actions.length > 0 ? (pipe as any)(vBoolean(state.message), ...state.actions) : vBoolean(state.message)
     }
 
-    const result = safeParse(valibotSchema, value)
-
-    if (result.success) {
-      return { value: result.output }
-    }
-
-    return {
-      issues: result.issues.map((issue) => ({
-        message: issue.message,
-        path: issue.path?.map((item: any) => item.key as string | number),
-      })),
-    }
+    return toStandardResult(safeParse(valibotSchema, value))
   }
 
-  const schema: XantoBooleanSchema = {
-    '~standard': {
-      version: 1,
-      vendor: 'xanto',
-      validate,
-      types: {
-        input: undefined as unknown as boolean,
-        output: undefined as unknown as boolean,
-      },
-    },
+  return {
+    ...createStandardSchema<boolean, boolean>(validate),
 
-    coerce() {
-      isCoerce = true
-      return schema
-    },
+    coerce: () => build({ ...state, isCoerce: true }),
 
-    optional(def?: any) {
-      isOptional = true
-      if (def !== undefined) defaultValue = def
-      return schema as any
-    },
-
-    default(def: any) {
-      return schema.optional(def)
-    },
+    ...createOptionalMethods(state, build),
   }
+}
 
-  return schema
+export function boolean(message?: string): XantoBooleanSchema {
+  return build(createInitialState(message))
 }
