@@ -1,39 +1,25 @@
-import { boolean as vBoolean, pipe, transform, unknown as vUnknown, safeParse } from 'valibot'
+import { boolean as vBoolean, safeParse } from 'valibot'
 
 import { createInitialState, createOptionalMethods } from '../core/state.js'
 import { createStandardSchema, toStandardResult } from '../core/standard.js'
+import { resolveValibotSchema } from '../core/coerce.js'
 
-import type { ChainState } from '../types/chainState.types.js'
+import type { CoercibleChainState } from '../types/chainState.types.js'
 import type { XantoBooleanSchema } from '../types/chain.types.js'
 
-interface BooleanChainState extends ChainState<boolean> {
-  isCoerce?: boolean
+function coerceToBoolean(val: unknown): unknown {
+  if (val === 'true' || val === '1' || val === 1) return true
+  if (val === 'false' || val === '0' || val === 0) return false
+  return val
 }
 
-function build(state: BooleanChainState): XantoBooleanSchema {
+function build(state: CoercibleChainState<boolean>): XantoBooleanSchema {
   function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
       return { value: state.defaultValue as any }
     }
 
-    let valibotSchema: any
-
-    if (state.isCoerce) {
-      valibotSchema = (pipe as any)(
-        vUnknown(),
-        transform((val: unknown) => {
-          if (val === 'true' || val === '1' || val === 1) return true
-          if (val === 'false' || val === '0' || val === 0) return false
-          return val
-        }),
-        vBoolean(state.message),
-        ...state.actions
-      )
-    } else {
-      valibotSchema =
-        state.actions.length > 0 ? (pipe as any)(vBoolean(state.message), ...state.actions) : vBoolean(state.message)
-    }
-
+    const valibotSchema = resolveValibotSchema(vBoolean, state, coerceToBoolean)
     return toStandardResult(safeParse(valibotSchema, value))
   }
 
