@@ -122,7 +122,8 @@ describe('t.array() with chaining', () => {
       expect('issues' in (await strictMinSchema['~standard'].validate([]))).toBe(true)
     })
 
-    it('should correctly handle repeated length/min/max constraint overrides', async () => {
+    it('should prevent repeated min() calls at the type level for arrays (but handle them in runtime)', async () => {
+      // @ts-expect-error - second min() should not be allowed by types
       const schema = t.array(t.string()).min(2).min(5)
 
       expect('issues' in (await schema['~standard'].validate(['a', 'b', 'c']))).toBe(true)

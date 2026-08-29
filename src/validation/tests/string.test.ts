@@ -139,6 +139,7 @@ describe('t.string() with chaining', () => {
     })
 
     it('should allow repeated min() calls in the same chain (last constraint applies cumulatively)', () => {
+      // @ts-expect-error - second min() should not be allowed by types
       const schema = t.string().min(1).min(5)
 
       expect('issues' in schema['~standard'].validate('abc')).toBe(true)

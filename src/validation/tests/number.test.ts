@@ -141,20 +141,23 @@ describe('t.number() with chaining', () => {
       expect('issues' in schema['~standard'].validate('101')).toBe(true)
     })
 
-    it('should handle repeated min() calls (last value should accumulate/override logic)', () => {
+    it('should prevent repeated min() calls at the type level (but handle them in runtime)', () => {
+      // @ts-expect-error - second min() should not be allowed by types
       const schema = t.number().min(5).min(20)
 
       expect('issues' in schema['~standard'].validate(15)).toBe(true)
       expect(schema['~standard'].validate(20)).toEqual({ value: 20 })
     })
 
-    it('should handle repeated max() calls correctly', () => {
+    it('should prevent repeated max() calls at the type level (but handle them in runtime)', () => {
+      // @ts-expect-error - second max() should not be allowed by types
       const schema = t.number().max(50).max(10)
 
       expect('issues' in schema['~standard'].validate(20)).toBe(true)
       expect(schema['~standard'].validate(10)).toEqual({ value: 10 })
     })
 
+    
     it('should preserve accumulated constraints when default() is chained at the end', () => {
       const schema = t.number().coerce().integer().min(1).max(5).default(3)
 
