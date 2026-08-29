@@ -73,4 +73,95 @@ describe('t.object() with chaining', () => {
       },
     })
   })
+
+  it('should accept missing keys when field schema is optional', async () => {
+    const schema = t.object({
+      name: t.string(),
+      nickname: t.string().optional(),
+    })
+
+    const result = await schema['~standard'].validate({ name: 'Alex' })
+
+    expect(result).toEqual({ value: { name: 'Alex', nickname: undefined } })
+  })
+
+  it('should apply default values for missing optional fields', async () => {
+    const schema = t.object({
+      name: t.string(),
+      role: t.string().default('guest'),
+    })
+
+    const result = await schema['~standard'].validate({ name: 'Alex' })
+
+    expect(result).toEqual({ value: { name: 'Alex', role: 'guest' } })
+  })
+
+  it('should report multiple issues for multiple invalid fields', async () => {
+    const schema = t.object({
+      name: t.string().min(3),
+      age: t.number().min(18),
+    })
+
+    const result = await schema['~standard'].validate({ name: 'Al', age: 10 })
+
+    expect('issues' in result && result.issues).toBeTruthy()
+    if ('issues' in result && result.issues) {
+      expect(result.issues.length).toBe(2)
+    }
+  })
+
+  it('should ignore extra keys not present in shape', async () => {
+    const schema = t.object({ name: t.string() })
+
+    const result = await schema['~standard'].validate({ name: 'Alex', extra: 'ignored' })
+
+    expect(result).toEqual({ value: { name: 'Alex' } })
+  })
+
+  it('should use custom message for non-object rejection', async () => {
+    const schema = t.object({ name: t.string() }, 'Expected a user object')
+
+    const result = await schema['~standard'].validate('not-an-object')
+
+    expect('issues' in result && result.issues).toBeTruthy()
+    if ('issues' in result && result.issues) {
+      expect(result.issues[0]?.message).toBe('Expected a user object')
+    }
+  })
+
+  describe('immutability across branches', () => {
+    it('should not affect base schema when calling default() on it', async () => {
+      const base = t.object({ name: t.string() })
+      const withDefault = base.default({ name: 'guest' })
+
+      expect('issues' in (await base['~standard'].validate(undefined))).toBe(true)
+      expect(await withDefault['~standard'].validate(undefined)).toEqual({ value: { name: 'guest' } })
+    })
+  })
+
+  describe('exposed shape', () => {
+    it('should expose the original shape', () => {
+      const nameSchema = t.string()
+      const schema = t.object({ name: nameSchema })
+      expect(schema.shape.name).toBe(nameSchema)
+    })
+
+    it('should preserve shape after chaining optional', () => {
+      const nameSchema = t.string()
+      const schema = t.object({ name: nameSchema }).optional()
+      expect(schema.shape.name).toBe(nameSchema)
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should validate an empty shape against an empty object', async () => {
+      const schema = t.object({})
+      expect(await schema['~standard'].validate({})).toEqual({ value: {} })
+    })
+
+    it('should reject arrays even though typeof array is object', async () => {
+      const schema = t.object({ name: t.string() })
+      expect('issues' in (await schema['~standard'].validate(['a', 'b']))).toBe(true)
+    })
+  })
 })

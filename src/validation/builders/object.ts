@@ -1,18 +1,18 @@
-import type { StandardResult } from '../../types/schema.types.js'
+import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createStandardSchema } from '../core/standard.js'
+
+import type { ChainState } from '../types/chainState.types.js'
 import type { ObjectShape, InferObjectInput, InferObjectOutput, XantoObjectSchema } from '../types/chain.types.js'
 
-export function object<Shape extends ObjectShape>(shape: Shape, message?: string): XantoObjectSchema<Shape> {
-  let defaultValue: InferObjectOutput<Shape> | undefined = undefined
-  let isOptional = false
-
-  async function validate(value: unknown): Promise<StandardResult<InferObjectOutput<Shape>>> {
-    if (value === undefined && isOptional) {
-      return { value: defaultValue as any }
+function build<Shape extends ObjectShape>(shape: Shape, state: ChainState<InferObjectOutput<Shape>>): XantoObjectSchema<Shape> {
+  async function validate(value: unknown) {
+    if (value === undefined && state.isOptional) {
+      return { value: state.defaultValue as any }
     }
 
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       return {
-        issues: [{ message: message ?? 'Expected object' }],
+        issues: [{ message: state.message ?? 'Expected object' }],
       }
     }
 
@@ -43,28 +43,13 @@ export function object<Shape extends ObjectShape>(shape: Shape, message?: string
     return { value: output as InferObjectOutput<Shape> }
   }
 
-  const schema: XantoObjectSchema<Shape> = {
+  return {
     shape,
-    '~standard': {
-      version: 1,
-      vendor: 'xanto',
-      validate,
-      types: {
-        input: undefined as unknown as InferObjectInput<Shape>,
-        output: undefined as unknown as InferObjectOutput<Shape>,
-      },
-    },
-
-    optional(def?: any) {
-      isOptional = true
-      if (def !== undefined) defaultValue = def
-      return schema as any
-    },
-
-    default(def: any) {
-      return schema.optional(def)
-    },
+    ...createStandardSchema<InferObjectInput<Shape>, InferObjectOutput<Shape>>(validate),
+    ...createOptionalMethods(state, (newState) => build(shape, newState)),
   }
+}
 
-  return schema
+export function object<Shape extends ObjectShape>(shape: Shape, message?: string): XantoObjectSchema<Shape> {
+  return build(shape, createInitialState(message))
 }
