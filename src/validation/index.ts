@@ -1,4 +1,6 @@
 export { t } from './t.js'
+export { parse, safeParse } from './parse.js'
+export { ValidationError } from './errors.js'
 export type {
   StandardSchemaV1,
   StandardFailureResult,
