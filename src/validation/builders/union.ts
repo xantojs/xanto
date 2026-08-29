@@ -1,13 +1,17 @@
-import type { StandardSchemaV1, StandardResult, StandardIssue } from '../../types/schema.types.js'
+import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createStandardSchema } from '../core/standard.js'
+
+import type { StandardSchemaV1, StandardIssue } from '../../types/schema.types.js'
+import type { ChainState } from '../types/chainState.types.js'
 import type { XantoUnionSchema, InferUnionInput, InferUnionOutput } from '../types/chain.types.js'
 
-export function union<const T extends readonly StandardSchemaV1<any, any>[]>(options: T, message?: string): XantoUnionSchema<T> {
-  let defaultValue: InferUnionOutput<T> | undefined = undefined
-  let isOptional = false
-
-  async function validate(value: unknown): Promise<StandardResult<InferUnionOutput<T>>> {
-    if (value === undefined && isOptional) {
-      return { value: defaultValue as any }
+function build<const T extends readonly StandardSchemaV1<any, any>[]>(
+  options: T,
+  state: ChainState<InferUnionOutput<T>>
+): XantoUnionSchema<T> {
+  async function validate(value: unknown) {
+    if (value === undefined && state.isOptional) {
+      return { value: state.defaultValue as any }
     }
 
     const allIssues: StandardIssue[] = []
@@ -25,34 +29,20 @@ export function union<const T extends readonly StandardSchemaV1<any, any>[]>(opt
     return {
       issues: [
         {
-          message: message ?? 'Value does not match any union schema option',
+          message: state.message ?? 'Value does not match any union schema option',
         },
       ],
     }
   }
 
-  const schema: XantoUnionSchema<T> = {
+  return {
     options,
-    '~standard': {
-      version: 1,
-      vendor: 'xanto',
-      validate,
-      types: {
-        input: undefined as unknown as InferUnionInput<T>,
-        output: undefined as unknown as InferUnionOutput<T>,
-      },
-    },
+    ...createStandardSchema<InferUnionInput<T>, InferUnionOutput<T>>(validate),
 
-    optional(def?: any) {
-      isOptional = true
-      if (def !== undefined) defaultValue = def
-      return schema as any
-    },
-
-    default(def: any) {
-      return schema.optional(def)
-    },
+    ...createOptionalMethods(state, (newState) => build(options, newState)),
   }
+}
 
-  return schema
+export function union<const T extends readonly StandardSchemaV1<any, any>[]>(options: T, message?: string): XantoUnionSchema<T> {
+  return build(options, createInitialState(message))
 }
