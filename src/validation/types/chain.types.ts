@@ -47,6 +47,10 @@ export interface XantoArraySchema<ItemInput, ItemOutput> extends XantoSchema<Ite
   min(length: number, message?: string): Omit<XantoArraySchema<ItemInput, ItemOutput>, 'length'>
   max(length: number, message?: string): Omit<XantoArraySchema<ItemInput, ItemOutput>, 'length'>
   length(length: number, message?: string): Omit<XantoArraySchema<ItemInput, ItemOutput>, 'min' | 'max' | 'length'>
+
+  optional(): XantoArraySchema<ItemInput, ItemOutput>
+  optional<D>(defaultValue: D): XantoArraySchema<ItemInput, ItemOutput>
+  default<D>(defaultValue: D): XantoArraySchema<ItemInput, ItemOutput>
 }
 
 export interface XantoEnumSchema<T extends readonly string[]> extends XantoSchema<T[number], T[number]> {
@@ -59,6 +63,10 @@ export interface XantoEnumSchema<T extends readonly string[]> extends XantoSchem
 
 export interface XantoLiteralSchema<T extends string | number | boolean> extends XantoSchema<T, T> {
   readonly literalValue: T
+
+  optional(): XantoLiteralSchema<T>
+  optional<D>(defaultValue: D): XantoLiteralSchema<T>
+  default<D>(defaultValue: D): XantoLiteralSchema<T>
 }
 
 export type InferUnionInput<T extends readonly StandardSchemaV1<any, any>[]> = InferInput<T[number]>
@@ -69,6 +77,10 @@ export interface XantoUnionSchema<T extends readonly StandardSchemaV1<any, any>[
   InferUnionOutput<T>
 > {
   readonly options: T
+
+  optional(): XantoUnionSchema<T>
+  optional<D>(defaultValue: D): XantoUnionSchema<T>
+  default<D>(defaultValue: D): XantoUnionSchema<T>
 }
 
 export type ObjectShape = Record<string, StandardSchemaV1<any, any>>
@@ -86,4 +98,8 @@ export interface XantoObjectSchema<Shape extends ObjectShape> extends XantoSchem
   InferObjectOutput<Shape>
 > {
   readonly shape: Shape
+
+  optional(): XantoObjectSchema<Shape>
+  optional<D>(defaultValue: D): XantoObjectSchema<Shape>
+  default<D>(defaultValue: D): XantoObjectSchema<Shape>
 }
