@@ -1,54 +1,28 @@
 import { literal as vLiteral, safeParse } from 'valibot'
+
+import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createStandardSchema, toStandardResult } from '../core/standard.js'
+
+import type { ChainState } from '../types/chainState.types.js'
 import type { XantoLiteralSchema } from '../types/chain.types.js'
-import type { StandardResult } from '../../types/schema.types.js'
+
+function build<const T extends string | number | boolean>(expectedValue: T, state: ChainState<T>): XantoLiteralSchema<T> {
+  const valibotSchema = vLiteral(expectedValue, state.message)
+
+  function validate(value: unknown) {
+    if (value === undefined && state.isOptional) {
+      return { value: state.defaultValue as any }
+    }
+    return toStandardResult(safeParse(valibotSchema, value))
+  }
+
+  return {
+    literalValue: expectedValue,
+    ...createStandardSchema<T, T>(validate),
+    ...createOptionalMethods(state, (newState) => build(expectedValue, newState)),
+  }
+}
 
 export function literal<const T extends string | number | boolean>(expectedValue: T, message?: string): XantoLiteralSchema<T> {
-  let defaultValue: T | undefined = undefined
-  let isOptional = false
-
-  const valibotSchema = vLiteral(expectedValue, message)
-
-  function validate(value: unknown): StandardResult<T> {
-    if (value === undefined && isOptional) {
-      return { value: defaultValue as any }
-    }
-
-    const result = safeParse(valibotSchema, value)
-
-    if (result.success) {
-      return { value: result.output as T }
-    }
-
-    return {
-      issues: result.issues.map((issue) => ({
-        message: issue.message,
-        path: issue.path?.map((item: any) => item.key as string | number),
-      })),
-    }
-  }
-
-  const schema: XantoLiteralSchema<T> = {
-    literalValue: expectedValue,
-    '~standard': {
-      version: 1,
-      vendor: 'xanto',
-      validate,
-      types: {
-        input: undefined as unknown as T,
-        output: undefined as unknown as T,
-      },
-    },
-
-    optional(def?: any) {
-      isOptional = true
-      if (def !== undefined) defaultValue = def
-      return schema as any
-    },
-
-    default(def: any) {
-      return schema.optional(def)
-    },
-  }
-
-  return schema
+  return build(expectedValue, createInitialState(message))
 }
