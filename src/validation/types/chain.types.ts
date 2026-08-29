@@ -51,6 +51,10 @@ export interface XantoArraySchema<ItemInput, ItemOutput> extends XantoSchema<Ite
 
 export interface XantoEnumSchema<T extends readonly string[]> extends XantoSchema<T[number], T[number]> {
   readonly options: T
+
+  optional(): XantoEnumSchema<T>
+  optional<D>(defaultValue: D): XantoEnumSchema<T>
+  default<D>(defaultValue: D): XantoEnumSchema<T>
 }
 
 export interface XantoLiteralSchema<T extends string | number | boolean> extends XantoSchema<T, T> {
