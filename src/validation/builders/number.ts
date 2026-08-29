@@ -8,25 +8,26 @@ import {
   unknown as vUnknown,
   safeParse,
   type PipeAction,
-  type BaseSchema,
 } from 'valibot'
+
+import { createInitialState, withAction, createOptionalMethods, toStandardResult } from '../utils/chain.util.js'
+
+import type { ChainState } from '../types/chainState.type.js'
 import type { XantoNumberSchema } from '../types/chain.types.js'
-import type { StandardResult } from '../../types/schema.types.js'
 
-export function number(message?: string): XantoNumberSchema {
-  const actions: PipeAction<number, number, any>[] = []
-  let isCoerce = false
-  let defaultValue: number | undefined = undefined
-  let isOptional = false
+interface NumberChainState extends ChainState<number> {
+  isCoerce?: boolean
+}
 
-  function validate(value: unknown): StandardResult<number> {
-    if (value === undefined && isOptional) {
-      return { value: defaultValue as any }
+function build(state: NumberChainState): XantoNumberSchema {
+  function validate(value: unknown) {
+    if (value === undefined && state.isOptional) {
+      return { value: state.defaultValue as any }
     }
 
-    let valibotSchema: BaseSchema<any, any, any>
+    let valibotSchema: any
 
-    if (isCoerce) {
+    if (state.isCoerce) {
       valibotSchema = (pipe as any)(
         vUnknown(),
         transform((val: unknown) => {
@@ -36,68 +37,35 @@ export function number(message?: string): XantoNumberSchema {
           }
           return val
         }),
-        vNumber(message),
-        ...actions
+        vNumber(state.message),
+        ...state.actions
       )
     } else {
-      valibotSchema = actions.length > 0 ? (pipe as any)(vNumber(message), ...actions) : vNumber(message)
+      valibotSchema = state.actions.length > 0 ? (pipe as any)(vNumber(state.message), ...state.actions) : vNumber(state.message)
     }
 
-    const result = safeParse(valibotSchema, value)
-
-    if (result.success) {
-      return { value: result.output }
-    }
-
-    return {
-      issues: result.issues.map((issue) => ({
-        message: issue.message,
-        path: issue.path?.map((item: any) => item.key as string | number),
-      })),
-    }
+    return toStandardResult(safeParse(valibotSchema, value))
   }
 
-  const schema: XantoNumberSchema = {
+  const chain = (action: PipeAction<any, any, any>) => build(withAction(state, action))
+
+  return {
     '~standard': {
       version: 1,
       vendor: 'xanto',
       validate,
-      types: {
-        input: undefined as unknown as number,
-        output: undefined as unknown as number,
-      },
+      types: { input: undefined as unknown as number, output: undefined as unknown as number },
     },
+    min: (len, msg) => chain(minValue(len, msg)) as any,
+    max: (len, msg) => chain(maxValue(len, msg)) as any,
+    integer: (msg) => chain(vInteger(msg)) as any,
 
-    min(val: number, msg?: string) {
-      actions.push(minValue(val, msg))
-      return schema
-    },
+    coerce: () => build({ ...state, isCoerce: true }),
 
-    max(val: number, msg?: string) {
-      actions.push(maxValue(val, msg))
-      return schema
-    },
-
-    integer(msg?: string) {
-      actions.push(vInteger(msg))
-      return schema
-    },
-
-    coerce() {
-      isCoerce = true
-      return schema
-    },
-
-    optional(def?: any) {
-      isOptional = true
-      if (def !== undefined) defaultValue = def
-      return schema as any
-    },
-
-    default(def: any) {
-      return schema.optional(def)
-    },
+    ...createOptionalMethods(state, build),
   }
+}
 
-  return schema
+export function number(message?: string): XantoNumberSchema {
+  return build(createInitialState(message))
 }
