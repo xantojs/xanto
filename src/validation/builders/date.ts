@@ -2,39 +2,26 @@ import { date as vDate, pipe, minValue, maxValue, transform, unknown as vUnknown
 
 import { createInitialState, createOptionalMethods, withAction } from '../core/state.js'
 import { createStandardSchema, toStandardResult } from '../core/standard.js'
+import { resolveValibotSchema } from '../core/coerce.js'
 
-import type { ChainState } from '../types/chainState.types.js'
+import type { CoercibleChainState } from '../types/chainState.types.js'
 import type { XantoDateSchema } from '../types/chain.types.js'
 
-interface DateChainState extends ChainState<Date> {
-  isCoerce?: boolean
+function coerceToDate(val: unknown): unknown {
+  if (typeof val === 'string' || typeof val === 'number') {
+    const parsed = new Date(val)
+    return isNaN(parsed.getTime()) ? val : parsed
+  }
+  return val
 }
 
-function build(state: DateChainState): XantoDateSchema {
+function build(state: CoercibleChainState<Date>): XantoDateSchema {
   function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
       return { value: state.defaultValue as any }
     }
 
-    let valibotSchema: any
-
-    if (state.isCoerce) {
-      valibotSchema = (pipe as any)(
-        vUnknown(),
-        transform((val: unknown) => {
-          if (typeof val === 'string' || typeof val === 'number') {
-            const parsed = new Date(val)
-            return isNaN(parsed.getTime()) ? val : parsed
-          }
-          return val
-        }),
-        vDate(state.message),
-        ...state.actions
-      )
-    } else {
-      valibotSchema = state.actions.length > 0 ? (pipe as any)(vDate(state.message), ...state.actions) : vDate(state.message)
-    }
-
+    const valibotSchema = resolveValibotSchema(vDate, state, coerceToDate)
     return toStandardResult(safeParse(valibotSchema, value))
   }
 
