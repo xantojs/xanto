@@ -1,5 +1,5 @@
 import { GET } from '@xanto/core/routing'
-import { t } from '@xanto/core/validation'
+import { x } from '@xanto/core/validation'
 
 import { HttpStatus } from '@xanto/core'
 
@@ -15,9 +15,9 @@ interface MyState {
 
 export default GET<MyState>({
   schema: {
-    query: t.object({
-      id: t.number().coerce(),
-      user: t.string().min(3),
+    query: x.object({
+      id: x.number().coerce(),
+      user: x.string().min(3),
     }),
   },
   handler(ctx) {
