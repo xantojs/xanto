@@ -13,15 +13,26 @@ interface MyState {
   users: Users[]
 }
 
-export default GET<MyState>({
+export default GET({
   schema: {
     query: x.object({
       id: x.number().coerce(),
       user: x.string().min(3),
     }),
+    state: x.object({
+      userId: x.number(),
+      users: x.array(
+        x.object({
+          name: x.string(),
+          age: x.number(),
+        })
+      ),
+    }),
   },
   handler(ctx) {
     ctx.status(HttpStatus.Ok)
+
+    ctx.query.id
 
     ctx.state.set('userId', 213123)
 
@@ -36,7 +47,7 @@ export default GET<MyState>({
       },
     ])
 
-    const userId = ctx.state.get('userId')
+    const userId = ctx.state.get<number>('userId')
 
     return userId
   },
