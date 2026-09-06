@@ -24,3 +24,9 @@ export class XantoStateManager<TState extends Record<string, unknown>> implement
     return Object.freeze(Object.fromEntries(this.store.entries())) as Readonly<Partial<TState>>
   }
 }
+
+declare module 'h3' {
+  interface H3EventContext {
+    __xantoState?: XantoStateManager<Record<string, unknown>>
+  }
+}
