@@ -34,3 +34,4 @@ export type {
   InferTupleInput,
   InferTupleOutput,
 } from './types/chain.types.js'
+export type { FlattenedErrors, ValidationErrorJSON } from './types/error.types.js'
