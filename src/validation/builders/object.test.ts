@@ -164,4 +164,39 @@ describe('t.object() with chaining', () => {
       expect('issues' in (await schema['~standard'].validate(['a', 'b']))).toBe(true)
     })
   })
+
+  describe('object modes', () => {
+    it('should strip unknown keys by default', async () => {
+      const schema = t.object({ name: t.string() })
+      const result = await schema['~standard'].validate({ name: 'Alex', extra: 1 })
+      expect(result).toEqual({ value: { name: 'Alex' } })
+    })
+
+    it('should keep unknown keys in passthrough mode', async () => {
+      const schema = t.object({ name: t.string() }).passthrough()
+      const result = await schema['~standard'].validate({ name: 'Alex', extra: 1 })
+      expect(result).toEqual({ value: { name: 'Alex', extra: 1 } })
+    })
+
+    it('should reject unknown keys in strict mode', async () => {
+      const schema = t.object({ name: t.string() }).strict()
+      const result = await schema['~standard'].validate({ name: 'Alex', extra: 1 })
+      expect('issues' in result && result.issues).toBeTruthy()
+      if ('issues' in result && result.issues) {
+        expect(result.issues[0]?.path).toEqual(['extra'])
+      }
+    })
+
+    it('should accept only known keys in strict mode', async () => {
+      const schema = t.object({ name: t.string() }).strict()
+      expect(await schema['~standard'].validate({ name: 'Alex' })).toEqual({ value: { name: 'Alex' } })
+    })
+
+    it('should preserve mode across optional/default chains', async () => {
+      const base = t.object({ name: t.string() }).passthrough()
+      const opt = base.optional()
+      const result = await opt['~standard'].validate({ name: 'Alex', extra: true })
+      expect(result).toEqual({ value: { name: 'Alex', extra: true } })
+    })
+  })
 })

@@ -114,6 +114,10 @@ export interface XantoObjectSchema<Shape extends ObjectShape> extends XantoSchem
 > {
   readonly shape: Shape
 
+  strip(): XantoObjectSchema<Shape>
+  passthrough(): XantoObjectSchema<Shape>
+  strict(): XantoObjectSchema<Shape>
+
   optional(): XantoObjectSchema<Shape>
   optional<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>
   default<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>

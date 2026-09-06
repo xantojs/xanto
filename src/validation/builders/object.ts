@@ -4,17 +4,25 @@ import { createStandardSchema } from '../core/standard.js'
 import type { ChainState } from '../types/chainState.types.js'
 import type { ObjectShape, InferObjectInput, InferObjectOutput, XantoObjectSchema } from '../types/chain.types.js'
 
-function build<Shape extends ObjectShape>(shape: Shape, state: ChainState<InferObjectOutput<Shape>>): XantoObjectSchema<Shape> {
-  const validate = handleOptional<InferObjectOutput<Shape>>(state, async (value) => {
+export type ObjectMode = 'strip' | 'passthrough' | 'strict'
+
+interface ObjectState<Shape extends ObjectShape> {
+  chain: ChainState<InferObjectOutput<Shape>>
+  mode: ObjectMode
+}
+
+function build<Shape extends ObjectShape>(shape: Shape, state: ObjectState<Shape>): XantoObjectSchema<Shape> {
+  const validate = handleOptional<InferObjectOutput<Shape>>(state.chain, async (value) => {
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       return {
-        issues: [{ message: state.message ?? 'Expected object' }],
+        issues: [{ message: state.chain.message ?? 'Expected object' }],
       }
     }
 
     const output: Record<string, unknown> = {}
     const issues: { message: string; path?: (string | number)[] }[] = []
     const record = value as Record<string, unknown>
+    const shapeKeys = Object.keys(shape)
 
     for (const [key, fieldSchema] of Object.entries(shape)) {
       const val = record[key]
@@ -32,6 +40,19 @@ function build<Shape extends ObjectShape>(shape: Shape, state: ChainState<InferO
       }
     }
 
+    const extraKeys = Object.keys(record).filter((key) => !shapeKeys.includes(key))
+    if (extraKeys.length > 0) {
+      if (state.mode === 'strict') {
+        for (const key of extraKeys) {
+          issues.push({ message: `Unexpected key "${key}"`, path: [key] })
+        }
+      } else if (state.mode === 'passthrough') {
+        for (const key of extraKeys) {
+          output[key] = record[key]
+        }
+      }
+    }
+
     if (issues.length > 0) {
       return { issues }
     }
@@ -42,10 +63,15 @@ function build<Shape extends ObjectShape>(shape: Shape, state: ChainState<InferO
   return {
     shape,
     ...createStandardSchema<InferObjectInput<Shape>, InferObjectOutput<Shape>>(validate),
-    ...createOptionalMethods(state, (newState) => build(shape, newState)),
+
+    strip: () => build(shape, { chain: state.chain, mode: 'strip' }),
+    passthrough: () => build(shape, { chain: state.chain, mode: 'passthrough' }),
+    strict: () => build(shape, { chain: state.chain, mode: 'strict' }),
+
+    ...createOptionalMethods(state.chain, (newChain) => build(shape, { chain: newChain, mode: state.mode })),
   }
 }
 
 export function object<Shape extends ObjectShape>(shape: Shape, message?: string): XantoObjectSchema<Shape> {
-  return build(shape, createInitialState(message))
+  return build(shape, { chain: createInitialState(message), mode: 'strip' })
 }
