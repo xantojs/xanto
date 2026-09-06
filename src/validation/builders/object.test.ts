@@ -199,4 +199,58 @@ describe('t.object() with chaining', () => {
       expect(result).toEqual({ value: { name: 'Alex', extra: true } })
     })
   })
+
+  describe('nested coercion', () => {
+    it('should coerce primitive fields inside an object', async () => {
+      const schema = t.object({
+        age: t.number().coerce(),
+        active: t.boolean().coerce(),
+        created: t.date().coerce(),
+      })
+
+      const dateStr = '2026-01-01T00:00:00.000Z'
+      const result = await schema['~standard'].validate({
+        age: '42',
+        active: 'true',
+        created: dateStr,
+      })
+
+      expect(result).toEqual({
+        value: {
+          age: 42,
+          active: true,
+          created: new Date(dateStr),
+        },
+      })
+    })
+
+    it('should coerce fields in deeply nested objects', async () => {
+      const schema = t.object({
+        user: t.object({
+          stats: t.object({
+            score: t.number().coerce().min(10),
+          }),
+        }),
+      })
+
+      const result = await schema['~standard'].validate({
+        user: {
+          stats: {
+            score: '15',
+          },
+        },
+      })
+
+      expect(result).toEqual({
+        value: {
+          user: {
+            stats: {
+              score: 15,
+            },
+          },
+        },
+      })
+    })
+  })
 })
+
