@@ -42,15 +42,29 @@ export type XantoNumberSchema<Excluded extends string = never> = Omit<XantoSchem
     default<D>(defaultValue: D): XantoSchema<number | undefined, number | D>
   }
 
-export interface XantoBooleanSchema extends XantoSchema<boolean, boolean> {
-  coerce(): Omit<XantoBooleanSchema, 'coerce'>
+type BooleanMethods<Excluded extends string> = {
+  coerce(): XantoBooleanSchema<Excluded | 'coerce'>
 }
 
-export interface XantoDateSchema extends XantoSchema<Date | string, Date> {
-  min(date: Date, message?: string): XantoDateSchema
-  max(date: Date, message?: string): XantoDateSchema
-  coerce(): Omit<XantoDateSchema, 'coerce'>
+export type XantoBooleanSchema<Excluded extends string = never> = Omit<XantoSchema<boolean, boolean>, 'optional' | 'default'> &
+  Omit<BooleanMethods<Excluded>, Excluded> & {
+    optional(): XantoBooleanSchema<Excluded>
+    optional<D>(defaultValue: D): XantoSchema<boolean | undefined, boolean | D>
+    default<D>(defaultValue: D): XantoSchema<boolean | undefined, boolean | D>
+  }
+
+type DateMethods<Excluded extends string> = {
+  min(date: Date, message?: string): XantoDateSchema<Excluded | 'min'>
+  max(date: Date, message?: string): XantoDateSchema<Excluded | 'max'>
+  coerce(): XantoDateSchema<Excluded | 'coerce'>
 }
+
+export type XantoDateSchema<Excluded extends string = never> = Omit<XantoSchema<Date | string, Date>, 'optional' | 'default'> &
+  Omit<DateMethods<Excluded>, Excluded> & {
+    optional(): XantoDateSchema<Excluded>
+    optional<D>(defaultValue: D): XantoSchema<Date | string | undefined, Date | D>
+    default<D>(defaultValue: D): XantoSchema<Date | string | undefined, Date | D>
+  }
 
 type ArrayMethods<ItemInput, ItemOutput, Excluded extends string> = {
   min(length: number, message?: string): XantoArraySchema<ItemInput, ItemOutput, Excluded | 'min' | 'length'>
@@ -108,20 +122,25 @@ export type InferObjectOutput<T extends ObjectShape> = {
   [K in keyof T]: InferOutput<T[K]>
 }
 
-export interface XantoObjectSchema<Shape extends ObjectShape> extends XantoSchema<
-  InferObjectInput<Shape>,
-  InferObjectOutput<Shape>
-> {
-  readonly shape: Shape
+export type ObjectMode = 'strip' | 'passthrough' | 'strict'
 
-  strip(): XantoObjectSchema<Shape>
-  passthrough(): XantoObjectSchema<Shape>
-  strict(): XantoObjectSchema<Shape>
-
-  optional(): XantoObjectSchema<Shape>
-  optional<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>
-  default<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>
+type ObjectModeMethods<Shape extends ObjectShape> = {
+  strip(): XantoObjectSchema<Shape, ObjectMode>
+  passthrough(): XantoObjectSchema<Shape, ObjectMode>
+  strict(): XantoObjectSchema<Shape, ObjectMode>
 }
+
+export type XantoObjectSchema<Shape extends ObjectShape, Excluded extends ObjectMode = never> = Omit<
+  XantoSchema<InferObjectInput<Shape>, InferObjectOutput<Shape>>,
+  'optional' | 'default'
+> &
+  Omit<ObjectModeMethods<Shape>, Excluded> & {
+    readonly shape: Shape
+
+    optional(): XantoObjectSchema<Shape, Excluded>
+    optional<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>
+    default<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>
+  }
 
 export interface XantoNullableSchema<T extends StandardSchemaV1> extends XantoSchema<
   InferInput<T> | null,
