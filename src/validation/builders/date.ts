@@ -18,12 +18,13 @@ function coerceToDate(val: unknown): unknown {
 type DateAction = PipeAction<Date, Date, BaseIssue<Date>>
 
 function build(state: CoercibleChainState<Date>): XantoDateSchema {
+  const valibotSchema = resolveValibotSchema(vDate, state, coerceToDate)
+
   function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
       return { value: state.defaultValue as Date }
     }
 
-    const valibotSchema = resolveValibotSchema(vDate, state, coerceToDate)
     return toStandardResult(safeParse(valibotSchema, value))
   }
 

@@ -25,15 +25,15 @@ const buildPipe = pipe as unknown as (...parts: unknown[]) => BaseSchema<unknown
 type StringAction = PipeAction<string, string, BaseIssue<string>>
 
 function build(state: ChainState<string>): XantoStringSchema {
+  const valibotSchema: BaseSchema<unknown, string, BaseIssue<unknown>> =
+    state.actions.length > 0
+      ? (buildPipe(vString(state.message), ...state.actions) as unknown as BaseSchema<unknown, string, BaseIssue<unknown>>)
+      : (vString(state.message) as unknown as BaseSchema<unknown, string, BaseIssue<unknown>>)
+
   function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
       return { value: state.defaultValue as string }
     }
-
-    const valibotSchema: BaseSchema<unknown, string, BaseIssue<unknown>> =
-      state.actions.length > 0
-        ? (buildPipe(vString(state.message), ...state.actions) as unknown as BaseSchema<unknown, string, BaseIssue<unknown>>)
-        : (vString(state.message) as unknown as BaseSchema<unknown, string, BaseIssue<unknown>>)
 
     return toStandardResult(safeParse(valibotSchema, value))
   }

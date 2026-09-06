@@ -18,12 +18,13 @@ function coerceToNumber(val: unknown): unknown {
 type NumberAction = PipeAction<number, number, BaseIssue<number>>
 
 function build(state: CoercibleChainState<number>): XantoNumberSchema {
+  const valibotSchema = resolveValibotSchema(vNumber, state, coerceToNumber)
+
   function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
       return { value: state.defaultValue as number }
     }
 
-    const valibotSchema = resolveValibotSchema(vNumber, state, coerceToNumber)
     return toStandardResult(safeParse(valibotSchema, value))
   }
 
