@@ -2,9 +2,7 @@ import { createInitialState, createOptionalMethods, handleOptional } from '../co
 import { createStandardSchema } from '../core/standard.js'
 
 import type { ChainState } from '../types/chainState.types.js'
-import type { ObjectShape, InferObjectInput, InferObjectOutput, XantoObjectSchema } from '../types/chain.types.js'
-
-export type ObjectMode = 'strip' | 'passthrough' | 'strict'
+import type { ObjectShape, InferObjectInput, InferObjectOutput, XantoObjectSchema, ObjectMode } from '../types/chain.types.js'
 
 interface ObjectState<Shape extends ObjectShape> {
   chain: ChainState<InferObjectOutput<Shape>>
