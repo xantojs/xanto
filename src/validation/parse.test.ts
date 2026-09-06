@@ -23,7 +23,7 @@ describe('Validation Parse Utilities', () => {
       await parse(schema, input)
     } catch (err) {
       if (err instanceof ValidationError) {
-        expect(err.issuses.length).toBeGreaterThan(0)
+        expect(err.issues.length).toBeGreaterThan(0)
         expect(err.name).toBe('ValidationError')
       }
     }
