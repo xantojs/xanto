@@ -1,16 +1,16 @@
 import { describe, it, expect } from 'vitest'
-import { t } from '../index.js'
+import { x } from '../index.js'
 
-describe('t.tuple()', () => {
+describe('x.tuple()', () => {
   it('should validate a fixed-length tuple', async () => {
-    const schema = t.tuple([t.string(), t.number()])
+    const schema = x.tuple([x.string(), x.number()])
     expect(await schema['~standard'].validate(['a', 1])).toEqual({ value: ['a', 1] })
     expect('issues' in (await schema['~standard'].validate(['a']))).toBe(true)
     expect('issues' in (await schema['~standard'].validate(['a', 'b']))).toBe(true)
   })
 
   it('should report per-item paths', async () => {
-    const schema = t.tuple([t.string(), t.number()])
+    const schema = x.tuple([x.string(), x.number()])
     const result = await schema['~standard'].validate(['a', 'not-a-number'])
     expect('issues' in result && result.issues).toBeTruthy()
     if ('issues' in result && result.issues) {
@@ -19,7 +19,7 @@ describe('t.tuple()', () => {
   })
 
   it('should support default chaining', async () => {
-    const schema = t.tuple([t.number()]).default([7])
+    const schema = x.tuple([x.number()]).default([7])
     expect(await schema['~standard'].validate(undefined)).toEqual({ value: [7] })
   })
 })

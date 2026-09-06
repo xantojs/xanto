@@ -14,7 +14,7 @@ import { tuple } from './builders/tuple.js'
 import { record } from './builders/record.js'
 import { pipe } from './builders/pipe.js'
 
-export const t = {
+export const x = {
   string,
   number,
   boolean,

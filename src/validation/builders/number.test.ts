@@ -1,16 +1,16 @@
 import { describe, it, expect } from 'vitest'
-import { t } from '../index.js'
+import { x } from '../index.js'
 
-describe('t.number() with chaining', () => {
+describe('x.number() with chaining', () => {
   it('should validate basic number', () => {
-    const schema = t.number()
+    const schema = x.number()
     expect(schema['~standard'].validate(42)).toEqual({ value: 42 })
     expect(schema['~standard'].validate(0)).toEqual({ value: 0 })
     expect(schema['~standard'].validate(-10.5)).toEqual({ value: -10.5 })
   })
 
   it('should reject non-number values', () => {
-    const schema = t.number()
+    const schema = x.number()
     expect('issues' in schema['~standard'].validate('42')).toBe(true)
     expect('issues' in schema['~standard'].validate(NaN)).toBe(true)
     expect('issues' in schema['~standard'].validate(null)).toBe(true)
@@ -20,7 +20,7 @@ describe('t.number() with chaining', () => {
   })
 
   it('should chain min and max value', () => {
-    const schema = t.number().min(10).max(20)
+    const schema = x.number().min(10).max(20)
     expect(schema['~standard'].validate(10)).toEqual({ value: 10 })
     expect(schema['~standard'].validate(20)).toEqual({ value: 20 })
     expect('issues' in schema['~standard'].validate(9.99)).toBe(true)
@@ -28,14 +28,14 @@ describe('t.number() with chaining', () => {
   })
 
   it('should chain integer constraint', () => {
-    const schema = t.number().integer()
+    const schema = x.number().integer()
     expect(schema['~standard'].validate(10)).toEqual({ value: 10 })
     expect(schema['~standard'].validate(-5)).toEqual({ value: -5 })
     expect('issues' in schema['~standard'].validate(10.5)).toBe(true)
   })
 
   it('should chain coerce from string', () => {
-    const schema = t.number().coerce().min(1)
+    const schema = x.number().coerce().min(1)
     expect(schema['~standard'].validate('42')).toEqual({ value: 42 })
     expect(schema['~standard'].validate('3.14')).toEqual({ value: 3.14 })
     expect('issues' in schema['~standard'].validate('0')).toBe(true)
@@ -44,11 +44,11 @@ describe('t.number() with chaining', () => {
   })
 
   it('should chain optional and default', () => {
-    const optionalSchema = t.number().optional()
+    const optionalSchema = x.number().optional()
     expect(optionalSchema['~standard'].validate(undefined)).toEqual({ value: undefined })
     expect(optionalSchema['~standard'].validate(42)).toEqual({ value: 42 })
 
-    const defaultSchema = t.number().min(0).default(100)
+    const defaultSchema = x.number().min(0).default(100)
     expect(defaultSchema['~standard'].validate(undefined)).toEqual({ value: 100 })
     expect(defaultSchema['~standard'].validate(200)).toEqual({ value: 200 })
     expect('issues' in defaultSchema['~standard'].validate(-5)).toBe(true)
@@ -56,7 +56,7 @@ describe('t.number() with chaining', () => {
 
   describe('immutability across branches', () => {
     it('should not leak constraints between branches built from the same base', () => {
-      const base = t.number().min(10)
+      const base = x.number().min(10)
 
       const min10Max20 = base.max(20)
       const min10Max50 = base.max(50)
@@ -69,7 +69,7 @@ describe('t.number() with chaining', () => {
     })
 
     it('should maintain coerce isolation across branches', () => {
-      const base = t.number()
+      const base = x.number()
       const coerced = base.coerce()
 
       expect('issues' in base['~standard'].validate('42')).toBe(true)
@@ -79,7 +79,7 @@ describe('t.number() with chaining', () => {
 
   describe('custom error messages', () => {
     it('should use custom message for min constraint', async () => {
-      const schema = t.number().min(18, 'Must be at least 18')
+      const schema = x.number().min(18, 'Must be at least 18')
       const result = await schema['~standard'].validate(16)
 
       expect(result.issues).toBeTruthy()
@@ -89,7 +89,7 @@ describe('t.number() with chaining', () => {
     })
 
     it('should use custom message for max constraint', async () => {
-      const schema = t.number().max(100, 'Too high')
+      const schema = x.number().max(100, 'Too high')
       const result = await schema['~standard'].validate(105)
 
       expect(result.issues).toBeTruthy()
@@ -99,7 +99,7 @@ describe('t.number() with chaining', () => {
     })
 
     it('should use custom base message for invalid type', async () => {
-      const schema = t.number('Expected a valid number')
+      const schema = x.number('Expected a valid number')
       const result = await schema['~standard'].validate('abc')
 
       expect(result.issues).toBeTruthy()
@@ -111,7 +111,7 @@ describe('t.number() with chaining', () => {
 
   describe('issues structure', () => {
     it('should return issues as a array on error', async () => {
-      const schema = t.number().integer()
+      const schema = x.number().integer()
       const result = await schema['~standard'].validate(3.14)
 
       expect(result.issues).toBeTruthy()
@@ -123,7 +123,7 @@ describe('t.number() with chaining', () => {
     })
 
     it('should not include issues on success', async () => {
-      const schema = t.number()
+      const schema = x.number()
       const result = await schema['~standard'].validate(10)
 
       expect(result.issues).toBeUndefined()
@@ -133,7 +133,7 @@ describe('t.number() with chaining', () => {
 
   describe('advanced edge cases & constraint combinations', () => {
     it('should correctly process combined coerce, integer, min, and max', () => {
-      const schema = t.number().coerce().integer().min(10).max(100)
+      const schema = x.number().coerce().integer().min(10).max(100)
 
       expect(schema['~standard'].validate('50')).toEqual({ value: 50 })
       expect('issues' in schema['~standard'].validate('9.9')).toBe(true)
@@ -143,7 +143,7 @@ describe('t.number() with chaining', () => {
 
     it('should prevent repeated min() calls at the type level (but handle them in runtime)', () => {
       // @ts-expect-error - second min() should not be allowed by types
-      const schema = t.number().min(5).min(20)
+      const schema = x.number().min(5).min(20)
 
       expect('issues' in schema['~standard'].validate(15)).toBe(true)
       expect(schema['~standard'].validate(20)).toEqual({ value: 20 })
@@ -151,7 +151,7 @@ describe('t.number() with chaining', () => {
 
     it('should prevent repeated max() calls at the type level (but handle them in runtime)', () => {
       // @ts-expect-error - second max() should not be allowed by types
-      const schema = t.number().max(50).max(10)
+      const schema = x.number().max(50).max(10)
 
       expect('issues' in schema['~standard'].validate(20)).toBe(true)
       expect(schema['~standard'].validate(10)).toEqual({ value: 10 })
@@ -159,7 +159,7 @@ describe('t.number() with chaining', () => {
 
     
     it('should preserve accumulated constraints when default() is chained at the end', () => {
-      const schema = t.number().coerce().integer().min(1).max(5).default(3)
+      const schema = x.number().coerce().integer().min(1).max(5).default(3)
 
       expect(schema['~standard'].validate(undefined)).toEqual({ value: 3 })
       expect(schema['~standard'].validate('4')).toEqual({ value: 4 })
@@ -168,7 +168,7 @@ describe('t.number() with chaining', () => {
     })
 
     it('should correctly prioritize custom error message on the failing constraint in a long chain', async () => {
-      const schema = t.number('Not a number').min(10, 'Value is too small').max(20, 'Value is too large')
+      const schema = x.number('Not a number').min(10, 'Value is too small').max(20, 'Value is too large')
 
       const minResult = await schema['~standard'].validate(5)
       expect(minResult.issues?.[0]?.message).toBe('Value is too small')
@@ -178,7 +178,7 @@ describe('t.number() with chaining', () => {
     })
 
     it('should correctly handle boundary conditions for floating point precision', () => {
-      const schema = t.number().min(0.1 + 0.2) // 0.30000000000000004
+      const schema = x.number().min(0.1 + 0.2) // 0.30000000000000004
 
       expect(schema['~standard'].validate(0.30000000000000004)).toEqual({ value: 0.30000000000000004 })
       expect('issues' in schema['~standard'].validate(0.3)).toBe(true)

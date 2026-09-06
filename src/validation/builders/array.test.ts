@@ -1,21 +1,21 @@
 import { describe, it, expect } from 'vitest'
-import { t } from '../index.js'
+import { x } from '../index.js'
 
-describe('t.array() with chaining', () => {
+describe('x.array() with chaining', () => {
   it('should validate array of items', async () => {
-    const schema = t.array(t.number())
+    const schema = x.array(x.number())
     const result = await schema['~standard'].validate([1, 2, 3])
     expect(result).toEqual({ value: [1, 2, 3] })
   })
 
   it('should reject non-array values', async () => {
-    const schema = t.array(t.string())
+    const schema = x.array(x.string())
     const result = await schema['~standard'].validate('not an array')
     expect('issues' in result && result.issues).toBeTruthy()
   })
 
   it('should chain min and max items', async () => {
-    const schema = t.array(t.number()).min(2).max(4)
+    const schema = x.array(x.number()).min(2).max(4)
     expect(await schema['~standard'].validate([1, 2])).toEqual({ value: [1, 2] })
     expect(await schema['~standard'].validate([1, 2, 3, 4])).toEqual({ value: [1, 2, 3, 4] })
 
@@ -27,7 +27,7 @@ describe('t.array() with chaining', () => {
   })
 
   it('should chain exact length', async () => {
-    const schema = t.array(t.string()).length(3)
+    const schema = x.array(x.string()).length(3)
     expect(await schema['~standard'].validate(['a', 'b', 'c'])).toEqual({ value: ['a', 'b', 'c'] })
 
     const wrongLength = await schema['~standard'].validate(['a', 'b'])
@@ -35,13 +35,13 @@ describe('t.array() with chaining', () => {
   })
 
   it('should chain optional and default', async () => {
-    const schema = t.array(t.string()).default(['guest'])
+    const schema = x.array(x.string()).default(['guest'])
     expect(await schema['~standard'].validate(undefined)).toEqual({ value: ['guest'] })
   })
 
   describe('element issues and paths tracking', () => {
     it('should aggregate issues from multiple invalid elements with proper index paths', async () => {
-      const schema = t.array(t.number())
+      const schema = x.array(x.number())
       const result = await schema['~standard'].validate([1, 'invalid', 3, 'bad'])
 
       expect('issues' in result && result.issues).toBeTruthy()
@@ -67,7 +67,7 @@ describe('t.array() with chaining', () => {
         },
       }
 
-      const schema = t.array(mockObjectSchema)
+      const schema = x.array(mockObjectSchema)
       const result = await schema['~standard'].validate([{ age: 20 }, { age: 'invalid' }])
 
       expect('issues' in result && result.issues).toBeTruthy()
@@ -79,7 +79,7 @@ describe('t.array() with chaining', () => {
 
   describe('immutability across branches', () => {
     it('should isolate constraints when branching from the same base array schema', async () => {
-      const base = t.array(t.number())
+      const base = x.array(x.number())
       const minTwo = base.min(2)
       const maxTwo = base.max(2)
 
@@ -93,7 +93,7 @@ describe('t.array() with chaining', () => {
     })
 
     it('should isolate optional/default modifications across branches', async () => {
-      const base = t.array(t.string())
+      const base = x.array(x.string())
       const withDefaultA = base.default(['a'])
       const withDefaultB = base.default(['b'])
 
@@ -105,7 +105,7 @@ describe('t.array() with chaining', () => {
 
   describe('custom messages & edge cases', () => {
     it('should use custom error message for root array type failure', async () => {
-      const schema = t.array(t.number(), 'Custom array expected message')
+      const schema = x.array(x.number(), 'Custom array expected message')
       const result = await schema['~standard'].validate('not-an-array')
 
       expect('issues' in result && result.issues).toBeTruthy()
@@ -115,16 +115,16 @@ describe('t.array() with chaining', () => {
     })
 
     it('should validate empty arrays when constraints permit', async () => {
-      const schema = t.array(t.number()).min(0)
+      const schema = x.array(x.number()).min(0)
       expect(await schema['~standard'].validate([])).toEqual({ value: [] })
 
-      const strictMinSchema = t.array(t.number()).min(1)
+      const strictMinSchema = x.array(x.number()).min(1)
       expect('issues' in (await strictMinSchema['~standard'].validate([]))).toBe(true)
     })
 
     it('should prevent repeated min() calls at the type level for arrays (but handle them in runtime)', async () => {
       // @ts-expect-error - second min() should not be allowed by types
-      const schema = t.array(t.string()).min(2).min(5)
+      const schema = x.array(x.string()).min(2).min(5)
 
       expect('issues' in (await schema['~standard'].validate(['a', 'b', 'c']))).toBe(true)
       expect(await schema['~standard'].validate(['a', 'b', 'c', 'd', 'e'])).toEqual({
@@ -133,7 +133,7 @@ describe('t.array() with chaining', () => {
     })
 
     it('should validate nested arrays correctly', async () => {
-      const nestedSchema = t.array(t.array(t.number()))
+      const nestedSchema = x.array(x.array(x.number()))
       const validData = [
         [1, 2],
         [3, 4, 5],

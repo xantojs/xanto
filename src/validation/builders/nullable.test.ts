@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { t } from '../index.js'
+import { x } from '../index.js'
 
-describe('t.nullable()', () => {
-  const schema = t.nullable(t.string())
+describe('x.nullable()', () => {
+  const schema = x.nullable(x.string())
 
   it('should accept null', async () => {
     expect(await schema['~standard'].validate(null)).toEqual({ value: null })
@@ -14,10 +14,10 @@ describe('t.nullable()', () => {
   })
 
   it('should support optional/default chaining', async () => {
-    const opt = t.nullable(t.string()).optional()
+    const opt = x.nullable(x.string()).optional()
     expect(await opt['~standard'].validate(undefined)).toEqual({ value: undefined })
 
-    const withDefault = t.nullable(t.string()).default('fallback')
+    const withDefault = x.nullable(x.string()).default('fallback')
     expect(await withDefault['~standard'].validate(undefined)).toEqual({ value: 'fallback' })
   })
 })

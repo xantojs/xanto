@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { t } from '../index.js'
+import { x } from '../index.js'
 
-describe('t.any() and t.unknown()', () => {
-  describe('t.any()', () => {
+describe('x.any() and x.unknown()', () => {
+  describe('x.any()', () => {
     it('should pass through any provided value', () => {
-      const schema = t.any()
+      const schema = x.any()
 
       expect(schema['~standard'].validate('hello')).toEqual({ value: 'hello' })
       expect(schema['~standard'].validate(123)).toEqual({ value: 123 })
@@ -15,17 +15,17 @@ describe('t.any() and t.unknown()', () => {
     })
 
     it('should handle optional and default values correctly', () => {
-      const optionalSchema = t.any().optional()
+      const optionalSchema = x.any().optional()
       expect(optionalSchema['~standard'].validate(undefined)).toEqual({ value: undefined })
       expect(optionalSchema['~standard'].validate('value')).toEqual({ value: 'value' })
 
-      const defaultSchema = t.any().default('fallback')
+      const defaultSchema = x.any().default('fallback')
       expect(defaultSchema['~standard'].validate(undefined)).toEqual({ value: 'fallback' })
       expect(defaultSchema['~standard'].validate('custom')).toEqual({ value: 'custom' })
     })
 
     it('should maintain immutability on chaining', () => {
-      const base = t.any()
+      const base = x.any()
       const withDefaultA = base.default('A')
       const withDefaultB = base.default('B')
 
@@ -35,9 +35,9 @@ describe('t.any() and t.unknown()', () => {
     })
   })
 
-  describe('t.unknown()', () => {
+  describe('x.unknown()', () => {
     it('should pass through any provided value as unknown', () => {
-      const schema = t.unknown()
+      const schema = x.unknown()
 
       expect(schema['~standard'].validate('text')).toEqual({ value: 'text' })
       expect(schema['~standard'].validate(42)).toEqual({ value: 42 })
@@ -46,7 +46,7 @@ describe('t.any() and t.unknown()', () => {
     })
 
     it('should handle optional and default values correctly', () => {
-      const defaultSchema = t.unknown().default(0)
+      const defaultSchema = x.unknown().default(0)
 
       expect(defaultSchema['~standard'].validate(undefined)).toEqual({ value: 0 })
       expect(defaultSchema['~standard'].validate(10)).toEqual({ value: 10 })

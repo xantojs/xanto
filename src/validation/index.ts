@@ -1,4 +1,4 @@
-export { t } from './t.js'
+export { x } from './x.js'
 export { parse, safeParse } from './parse.js'
 export { ValidationError } from './errors.js'
 export type {

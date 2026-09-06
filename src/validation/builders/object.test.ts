@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { t } from '../index.js'
+import { x } from '../index.js'
 
-describe('t.object() with chaining', () => {
+describe('x.object() with chaining', () => {
   it('should validate object with chaining fields', async () => {
-    const userSchema = t.object({
-      id: t.string().uuid(),
-      name: t.string().min(2),
-      age: t.number().min(18).optional(),
-      active: t.boolean().default(true),
+    const userSchema = x.object({
+      id: x.string().uuid(),
+      name: x.string().min(2),
+      age: x.number().min(18).optional(),
+      active: x.boolean().default(true),
     })
 
     const validUuid = '123e4567-e89b-12d3-a456-426614174000'
@@ -29,16 +29,16 @@ describe('t.object() with chaining', () => {
   })
 
   it('should reject non-object values', async () => {
-    const schema = t.object({ name: t.string() })
+    const schema = x.object({ name: x.string() })
     expect('issues' in (await schema['~standard'].validate('string'))).toBe(true)
     expect('issues' in (await schema['~standard'].validate(null))).toBe(true)
     expect('issues' in (await schema['~standard'].validate([]))).toBe(true)
   })
 
   it('should report correct path for invalid fields', async () => {
-    const schema = t.object({
-      name: t.string(),
-      age: t.number().min(18),
+    const schema = x.object({
+      name: x.string(),
+      age: x.number().min(18),
     })
 
     const result = await schema['~standard'].validate({
@@ -53,12 +53,12 @@ describe('t.object() with chaining', () => {
   })
 
   it('should validate nested objects and arrays', async () => {
-    const schema = t.object({
-      user: t.object({
-        name: t.string().min(2),
-        email: t.string().email(),
+    const schema = x.object({
+      user: x.object({
+        name: x.string().min(2),
+        email: x.string().email(),
       }),
-      roles: t.array(t.string()),
+      roles: x.array(x.string()),
     })
 
     const valid = await schema['~standard'].validate({
@@ -75,9 +75,9 @@ describe('t.object() with chaining', () => {
   })
 
   it('should accept missing keys when field schema is optional', async () => {
-    const schema = t.object({
-      name: t.string(),
-      nickname: t.string().optional(),
+    const schema = x.object({
+      name: x.string(),
+      nickname: x.string().optional(),
     })
 
     const result = await schema['~standard'].validate({ name: 'Alex' })
@@ -86,9 +86,9 @@ describe('t.object() with chaining', () => {
   })
 
   it('should apply default values for missing optional fields', async () => {
-    const schema = t.object({
-      name: t.string(),
-      role: t.string().default('guest'),
+    const schema = x.object({
+      name: x.string(),
+      role: x.string().default('guest'),
     })
 
     const result = await schema['~standard'].validate({ name: 'Alex' })
@@ -97,9 +97,9 @@ describe('t.object() with chaining', () => {
   })
 
   it('should report multiple issues for multiple invalid fields', async () => {
-    const schema = t.object({
-      name: t.string().min(3),
-      age: t.number().min(18),
+    const schema = x.object({
+      name: x.string().min(3),
+      age: x.number().min(18),
     })
 
     const result = await schema['~standard'].validate({ name: 'Al', age: 10 })
@@ -111,7 +111,7 @@ describe('t.object() with chaining', () => {
   })
 
   it('should ignore extra keys not present in shape', async () => {
-    const schema = t.object({ name: t.string() })
+    const schema = x.object({ name: x.string() })
 
     const result = await schema['~standard'].validate({ name: 'Alex', extra: 'ignored' })
 
@@ -119,7 +119,7 @@ describe('t.object() with chaining', () => {
   })
 
   it('should use custom message for non-object rejection', async () => {
-    const schema = t.object({ name: t.string() }, 'Expected a user object')
+    const schema = x.object({ name: x.string() }, 'Expected a user object')
 
     const result = await schema['~standard'].validate('not-an-object')
 
@@ -131,7 +131,7 @@ describe('t.object() with chaining', () => {
 
   describe('immutability across branches', () => {
     it('should not affect base schema when calling default() on it', async () => {
-      const base = t.object({ name: t.string() })
+      const base = x.object({ name: x.string() })
       const withDefault = base.default({ name: 'guest' })
 
       expect('issues' in (await base['~standard'].validate(undefined))).toBe(true)
@@ -141,45 +141,45 @@ describe('t.object() with chaining', () => {
 
   describe('exposed shape', () => {
     it('should expose the original shape', () => {
-      const nameSchema = t.string()
-      const schema = t.object({ name: nameSchema })
+      const nameSchema = x.string()
+      const schema = x.object({ name: nameSchema })
       expect(schema.shape.name).toBe(nameSchema)
     })
 
     it('should preserve shape after chaining optional', () => {
-      const nameSchema = t.string()
-      const schema = t.object({ name: nameSchema }).optional()
+      const nameSchema = x.string()
+      const schema = x.object({ name: nameSchema }).optional()
       expect(schema.shape.name).toBe(nameSchema)
     })
   })
 
   describe('edge cases', () => {
     it('should validate an empty shape against an empty object', async () => {
-      const schema = t.object({})
+      const schema = x.object({})
       expect(await schema['~standard'].validate({})).toEqual({ value: {} })
     })
 
     it('should reject arrays even though typeof array is object', async () => {
-      const schema = t.object({ name: t.string() })
+      const schema = x.object({ name: x.string() })
       expect('issues' in (await schema['~standard'].validate(['a', 'b']))).toBe(true)
     })
   })
 
   describe('object modes', () => {
     it('should strip unknown keys by default', async () => {
-      const schema = t.object({ name: t.string() })
+      const schema = x.object({ name: x.string() })
       const result = await schema['~standard'].validate({ name: 'Alex', extra: 1 })
       expect(result).toEqual({ value: { name: 'Alex' } })
     })
 
     it('should keep unknown keys in passthrough mode', async () => {
-      const schema = t.object({ name: t.string() }).passthrough()
+      const schema = x.object({ name: x.string() }).passthrough()
       const result = await schema['~standard'].validate({ name: 'Alex', extra: 1 })
       expect(result).toEqual({ value: { name: 'Alex', extra: 1 } })
     })
 
     it('should reject unknown keys in strict mode', async () => {
-      const schema = t.object({ name: t.string() }).strict()
+      const schema = x.object({ name: x.string() }).strict()
       const result = await schema['~standard'].validate({ name: 'Alex', extra: 1 })
       expect('issues' in result && result.issues).toBeTruthy()
       if ('issues' in result && result.issues) {
@@ -188,12 +188,12 @@ describe('t.object() with chaining', () => {
     })
 
     it('should accept only known keys in strict mode', async () => {
-      const schema = t.object({ name: t.string() }).strict()
+      const schema = x.object({ name: x.string() }).strict()
       expect(await schema['~standard'].validate({ name: 'Alex' })).toEqual({ value: { name: 'Alex' } })
     })
 
     it('should preserve mode across optional/default chains', async () => {
-      const base = t.object({ name: t.string() }).passthrough()
+      const base = x.object({ name: x.string() }).passthrough()
       const opt = base.optional()
       const result = await opt['~standard'].validate({ name: 'Alex', extra: true })
       expect(result).toEqual({ value: { name: 'Alex', extra: true } })
@@ -202,10 +202,10 @@ describe('t.object() with chaining', () => {
 
   describe('nested coercion', () => {
     it('should coerce primitive fields inside an object', async () => {
-      const schema = t.object({
-        age: t.number().coerce(),
-        active: t.boolean().coerce(),
-        created: t.date().coerce(),
+      const schema = x.object({
+        age: x.number().coerce(),
+        active: x.boolean().coerce(),
+        created: x.date().coerce(),
       })
 
       const dateStr = '2026-01-01T00:00:00.000Z'
@@ -225,10 +225,10 @@ describe('t.object() with chaining', () => {
     })
 
     it('should coerce fields in deeply nested objects', async () => {
-      const schema = t.object({
-        user: t.object({
-          stats: t.object({
-            score: t.number().coerce().min(10),
+      const schema = x.object({
+        user: x.object({
+          stats: x.object({
+            score: x.number().coerce().min(10),
           }),
         }),
       })

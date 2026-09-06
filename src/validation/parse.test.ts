@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { parse, safeParse } from './index'
 import { ValidationError } from './index'
-import { t } from './index'
+import { x } from './index'
 
 describe('Validation Parse Utilities', () => {
-  const schema = t.object({
-    username: t.string(),
-    age: t.number(),
+  const schema = x.object({
+    username: x.string(),
+    age: x.number(),
   })
 
   it('should successfully parse valid data and return typed output', async () => {

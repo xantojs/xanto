@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest'
-import { t } from '../index.js'
+import { x } from '../index.js'
 
-describe('t.boolean()', () => {
+describe('x.boolean()', () => {
   it('should validate strict boolean values', () => {
-    const schema = t.boolean()
+    const schema = x.boolean()
     expect(schema['~standard'].validate(true)).toEqual({ value: true })
     expect(schema['~standard'].validate(false)).toEqual({ value: false })
   })
 
   it('should reject non-boolean values in strict mode', () => {
-    const schema = t.boolean()
+    const schema = x.boolean()
     expect('issues' in schema['~standard'].validate('true')).toBe(true)
     expect('issues' in schema['~standard'].validate(1)).toBe(true)
     expect('issues' in schema['~standard'].validate(null)).toBe(true)
@@ -17,7 +17,7 @@ describe('t.boolean()', () => {
   })
 
   it('should coerce string and numeric truthy/falsy values', () => {
-    const schema = t.boolean().coerce()
+    const schema = x.boolean().coerce()
 
     expect(schema['~standard'].validate('true')).toEqual({ value: true })
     expect(schema['~standard'].validate('1')).toEqual({ value: true })
@@ -32,17 +32,17 @@ describe('t.boolean()', () => {
   })
 
   it('should handle optional and default values correctly', () => {
-    const optionalSchema = t.boolean().optional()
+    const optionalSchema = x.boolean().optional()
     expect(optionalSchema['~standard'].validate(undefined)).toEqual({ value: undefined })
     expect(optionalSchema['~standard'].validate(true)).toEqual({ value: true })
 
-    const defaultSchema = t.boolean().default(true)
+    const defaultSchema = x.boolean().default(true)
     expect(defaultSchema['~standard'].validate(undefined)).toEqual({ value: true })
     expect(defaultSchema['~standard'].validate(false)).toEqual({ value: false })
   })
 
   it('should maintain immutability on chaining', () => {
-    const base = t.boolean()
+    const base = x.boolean()
     const coerced = base.coerce()
 
     expect('issues' in base['~standard'].validate('true')).toBe(true)
@@ -50,7 +50,7 @@ describe('t.boolean()', () => {
   })
 
   it('should support custom error messages', () => {
-    const schema = t.boolean('Must be a boolean')
+    const schema = x.boolean('Must be a boolean')
     const result = schema['~standard'].validate('not-a-boolean')
 
     expect('issues' in result && result.issues).toBeTruthy()
