@@ -1,4 +1,4 @@
-import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createInitialState, createOptionalMethods, handleOptional } from '../core/state.js'
 import { createStandardSchema } from '../core/standard.js'
 
 import type { StandardSchemaV1, StandardIssue } from '../../types/schema.types.js'
@@ -9,11 +9,7 @@ function build<const T extends readonly StandardSchemaV1[]>(
   options: T,
   state: ChainState<InferUnionOutput<T>>
 ): XantoUnionSchema<T> {
-  async function validate(value: unknown) {
-    if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as InferUnionOutput<T> }
-    }
-
+  const validate = handleOptional<InferUnionOutput<T>>(state, async (value) => {
     const allIssues: StandardIssue[] = []
 
     for (const schema of options) {
@@ -33,7 +29,7 @@ function build<const T extends readonly StandardSchemaV1[]>(
         },
       ],
     }
-  }
+  })
 
   return {
     options,

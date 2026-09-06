@@ -14,7 +14,7 @@ import {
   type BaseSchema,
 } from 'valibot'
 
-import { createInitialState, createOptionalMethods, withAction } from '../core/state.js'
+import { createInitialState, createOptionalMethods, withAction, handleOptional } from '../core/state.js'
 import { createStandardSchema, toStandardResult } from '../core/standard.js'
 
 import type { ChainState } from '../types/chainState.types.js'
@@ -30,13 +30,7 @@ function build(state: ChainState<string>): XantoStringSchema {
       ? (buildPipe(vString(state.message), ...state.actions) as unknown as BaseSchema<unknown, string, BaseIssue<unknown>>)
       : (vString(state.message) as unknown as BaseSchema<unknown, string, BaseIssue<unknown>>)
 
-  function validate(value: unknown) {
-    if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as string }
-    }
-
-    return toStandardResult(safeParse(valibotSchema, value))
-  }
+  const validate = handleOptional<string>(state, (value) => toStandardResult(safeParse(valibotSchema, value)))
 
   const chain = (action: StringAction) => build(withAction(state, action))
 

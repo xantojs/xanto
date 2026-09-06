@@ -1,6 +1,6 @@
 import { boolean as vBoolean, safeParse } from 'valibot'
 
-import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createInitialState, createOptionalMethods, handleOptional } from '../core/state.js'
 import { createStandardSchema, toStandardResult } from '../core/standard.js'
 import { resolveValibotSchema } from '../core/coerce.js'
 
@@ -16,13 +16,7 @@ function coerceToBoolean(val: unknown): unknown {
 function build(state: CoercibleChainState<boolean>): XantoBooleanSchema {
   const valibotSchema = resolveValibotSchema(vBoolean, state, coerceToBoolean)
 
-  function validate(value: unknown) {
-    if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as boolean }
-    }
-
-    return toStandardResult(safeParse(valibotSchema, value))
-  }
+  const validate = handleOptional<boolean>(state, (value) => toStandardResult(safeParse(valibotSchema, value)))
 
   return {
     ...createStandardSchema<boolean, boolean>(validate),

@@ -24,8 +24,8 @@ type StringMethods<Excluded extends string> = {
 export type XantoStringSchema<Excluded extends string = never> = Omit<XantoSchema<string, string>, 'optional' | 'default'> &
   Omit<StringMethods<Excluded>, Excluded> & {
     optional(): XantoStringSchema<Excluded>
-    optional<D>(defaultValue: D): XantoStringSchema<Excluded>
-    default<D>(defaultValue: D): XantoStringSchema<Excluded>
+    optional<D>(defaultValue: D): XantoSchema<string | undefined, string | D>
+    default<D>(defaultValue: D): XantoSchema<string | undefined, string | D>
   }
 
 type NumberMethods<Excluded extends string> = {
@@ -38,8 +38,8 @@ type NumberMethods<Excluded extends string> = {
 export type XantoNumberSchema<Excluded extends string = never> = Omit<XantoSchema<number, number>, 'optional' | 'default'> &
   Omit<NumberMethods<Excluded>, Excluded> & {
     optional(): XantoNumberSchema<Excluded>
-    optional<D>(defaultValue: D): XantoNumberSchema<Excluded>
-    default<D>(defaultValue: D): XantoNumberSchema<Excluded>
+    optional<D>(defaultValue: D): XantoSchema<number | undefined, number | D>
+    default<D>(defaultValue: D): XantoSchema<number | undefined, number | D>
   }
 
 export interface XantoBooleanSchema extends XantoSchema<boolean, boolean> {
@@ -64,24 +64,24 @@ export type XantoArraySchema<ItemInput, ItemOutput, Excluded extends string = ne
 > &
   Omit<ArrayMethods<ItemInput, ItemOutput, Excluded>, Excluded> & {
     optional(): XantoArraySchema<ItemInput, ItemOutput, Excluded>
-    optional<D>(defaultValue: D): XantoArraySchema<ItemInput, ItemOutput, Excluded>
-    default<D>(defaultValue: D): XantoArraySchema<ItemInput, ItemOutput, Excluded>
+    optional<D>(defaultValue: D): XantoSchema<ItemInput[] | undefined, ItemOutput[] | D>
+    default<D>(defaultValue: D): XantoSchema<ItemInput[] | undefined, ItemOutput[] | D>
   }
 
 export interface XantoEnumSchema<T extends readonly string[]> extends XantoSchema<T[number], T[number]> {
   readonly options: T
 
   optional(): XantoEnumSchema<T>
-  optional<D>(defaultValue: D): XantoEnumSchema<T>
-  default<D>(defaultValue: D): XantoEnumSchema<T>
+  optional<D>(defaultValue: D): XantoSchema<T[number] | undefined, T[number] | D>
+  default<D>(defaultValue: D): XantoSchema<T[number] | undefined, T[number] | D>
 }
 
 export interface XantoLiteralSchema<T extends string | number | boolean> extends XantoSchema<T, T> {
   readonly literalValue: T
 
   optional(): XantoLiteralSchema<T>
-  optional<D>(defaultValue: D): XantoLiteralSchema<T>
-  default<D>(defaultValue: D): XantoLiteralSchema<T>
+  optional<D>(defaultValue: D): XantoSchema<T | undefined, T | D>
+  default<D>(defaultValue: D): XantoSchema<T | undefined, T | D>
 }
 
 export type InferUnionInput<T extends readonly StandardSchemaV1[]> = InferInput<T[number]>
@@ -94,8 +94,8 @@ export interface XantoUnionSchema<T extends readonly StandardSchemaV1[]> extends
   readonly options: T
 
   optional(): XantoUnionSchema<T>
-  optional<D>(defaultValue: D): XantoUnionSchema<T>
-  default<D>(defaultValue: D): XantoUnionSchema<T>
+  optional<D>(defaultValue: D): XantoSchema<InferUnionInput<T> | undefined, InferUnionOutput<T> | D>
+  default<D>(defaultValue: D): XantoSchema<InferUnionInput<T> | undefined, InferUnionOutput<T> | D>
 }
 
 export type ObjectShape = Record<string, StandardSchemaV1>
@@ -115,6 +115,6 @@ export interface XantoObjectSchema<Shape extends ObjectShape> extends XantoSchem
   readonly shape: Shape
 
   optional(): XantoObjectSchema<Shape>
-  optional<D>(defaultValue: D): XantoObjectSchema<Shape>
-  default<D>(defaultValue: D): XantoObjectSchema<Shape>
+  optional<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>
+  default<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>
 }

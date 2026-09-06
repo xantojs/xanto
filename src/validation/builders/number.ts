@@ -1,6 +1,6 @@
 import { number as vNumber, minValue, maxValue, integer as vInteger, safeParse, type PipeAction, type BaseIssue } from 'valibot'
 
-import { createInitialState, createOptionalMethods, withAction } from '../core/state.js'
+import { createInitialState, createOptionalMethods, withAction, handleOptional } from '../core/state.js'
 import { createStandardSchema, toStandardResult } from '../core/standard.js'
 import { resolveValibotSchema } from '../core/coerce.js'
 
@@ -20,13 +20,7 @@ type NumberAction = PipeAction<number, number, BaseIssue<number>>
 function build(state: CoercibleChainState<number>): XantoNumberSchema {
   const valibotSchema = resolveValibotSchema(vNumber, state, coerceToNumber)
 
-  function validate(value: unknown) {
-    if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as number }
-    }
-
-    return toStandardResult(safeParse(valibotSchema, value))
-  }
+  const validate = handleOptional<number>(state, (value) => toStandardResult(safeParse(valibotSchema, value)))
 
   const chain = (action: NumberAction) => build(withAction(state, action))
 

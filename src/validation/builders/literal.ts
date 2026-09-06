@@ -1,6 +1,6 @@
 import { literal as vLiteral, safeParse } from 'valibot'
 
-import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createInitialState, createOptionalMethods, handleOptional } from '../core/state.js'
 import { createStandardSchema, toStandardResult } from '../core/standard.js'
 
 import type { ChainState } from '../types/chainState.types.js'
@@ -9,12 +9,7 @@ import type { XantoLiteralSchema } from '../types/chain.types.js'
 function build<const T extends string | number | boolean>(expectedValue: T, state: ChainState<T>): XantoLiteralSchema<T> {
   const valibotSchema = vLiteral(expectedValue, state.message)
 
-  function validate(value: unknown) {
-    if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as T }
-    }
-    return toStandardResult(safeParse(valibotSchema, value))
-  }
+  const validate = handleOptional<T>(state, (value) => toStandardResult(safeParse(valibotSchema, value)))
 
   return {
     literalValue: expectedValue,

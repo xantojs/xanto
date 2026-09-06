@@ -1,15 +1,11 @@
-import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createInitialState, createOptionalMethods, handleOptional } from '../core/state.js'
 import { createStandardSchema } from '../core/standard.js'
 
 import type { ChainState } from '../types/chainState.types.js'
 import type { ObjectShape, InferObjectInput, InferObjectOutput, XantoObjectSchema } from '../types/chain.types.js'
 
 function build<Shape extends ObjectShape>(shape: Shape, state: ChainState<InferObjectOutput<Shape>>): XantoObjectSchema<Shape> {
-  async function validate(value: unknown) {
-    if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as InferObjectOutput<Shape> }
-    }
-
+  const validate = handleOptional<InferObjectOutput<Shape>>(state, async (value) => {
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       return {
         issues: [{ message: state.message ?? 'Expected object' }],
@@ -41,7 +37,7 @@ function build<Shape extends ObjectShape>(shape: Shape, state: ChainState<InferO
     }
 
     return { value: output as unknown as InferObjectOutput<Shape> }
-  }
+  })
 
   return {
     shape,

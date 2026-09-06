@@ -1,4 +1,4 @@
-import { createInitialState, createOptionalMethods } from '../core/state.js'
+import { createInitialState, createOptionalMethods, handleOptional } from '../core/state.js'
 import { createStandardSchema } from '../core/standard.js'
 
 import type { StandardSchemaV1, StandardResult, InferInput, InferOutput } from '../../types/schema.types.js'
@@ -18,11 +18,7 @@ function build<ItemSchema extends StandardSchemaV1>(
   type Input = InferInput<ItemSchema>[]
   type Output = InferOutput<ItemSchema>[]
 
-  async function validate(value: unknown): Promise<StandardResult<Output>> {
-    if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as Output }
-    }
-
+  const validate = handleOptional<Output>(state, async (value): Promise<StandardResult<Output>> => {
     if (!Array.isArray(value)) {
       return {
         issues: [{ message: state.message ?? 'Expected array' }],
@@ -69,7 +65,7 @@ function build<ItemSchema extends StandardSchemaV1>(
     }
 
     return { value: outputs }
-  }
+  })
 
   return {
     ...createStandardSchema<Input, Output>(validate),
