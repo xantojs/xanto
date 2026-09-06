@@ -7,11 +7,11 @@ import type { ChainState } from '../types/chainState.types.js'
 import type { XantoEnumSchema } from '../types/chain.types.js'
 
 function build<const T extends readonly string[]>(options: T, state: ChainState<T[number]>): XantoEnumSchema<T> {
-  const valibotSchema = picklist(options as any, state.message)
+  const valibotSchema = picklist(options as unknown as readonly [string, ...string[]], state.message)
 
   function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as any }
+      return { value: state.defaultValue as T[number] }
     }
     return toStandardResult(safeParse(valibotSchema, value))
   }

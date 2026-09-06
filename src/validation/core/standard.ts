@@ -1,4 +1,4 @@
-import type { StandardIssue, StandardResult } from '../../types/schema.types.js'
+import type { StandardSchemaV1, StandardIssue, StandardResult } from '../../types/schema.types.js'
 
 export function toStandardResult<Output>(
   result:
@@ -20,7 +20,7 @@ export function toStandardResult<Output>(
 
 export function createStandardSchema<Input, Output>(
   validateFn: (value: unknown) => StandardResult<Output> | Promise<StandardResult<Output>>
-) {
+): StandardSchemaV1<Input, Output> {
   return {
     '~standard': {
       version: 1 as const,

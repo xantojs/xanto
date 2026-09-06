@@ -84,10 +84,10 @@ export interface XantoLiteralSchema<T extends string | number | boolean> extends
   default<D>(defaultValue: D): XantoLiteralSchema<T>
 }
 
-export type InferUnionInput<T extends readonly StandardSchemaV1<any, any>[]> = InferInput<T[number]>
-export type InferUnionOutput<T extends readonly StandardSchemaV1<any, any>[]> = InferOutput<T[number]>
+export type InferUnionInput<T extends readonly StandardSchemaV1[]> = InferInput<T[number]>
+export type InferUnionOutput<T extends readonly StandardSchemaV1[]> = InferOutput<T[number]>
 
-export interface XantoUnionSchema<T extends readonly StandardSchemaV1<any, any>[]> extends XantoSchema<
+export interface XantoUnionSchema<T extends readonly StandardSchemaV1[]> extends XantoSchema<
   InferUnionInput<T>,
   InferUnionOutput<T>
 > {
@@ -98,7 +98,7 @@ export interface XantoUnionSchema<T extends readonly StandardSchemaV1<any, any>[
   default<D>(defaultValue: D): XantoUnionSchema<T>
 }
 
-export type ObjectShape = Record<string, StandardSchemaV1<any, any>>
+export type ObjectShape = Record<string, StandardSchemaV1>
 
 export type InferObjectInput<T extends ObjectShape> = {
   [K in keyof T]: InferInput<T[K]>

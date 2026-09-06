@@ -1,4 +1,4 @@
-import { date as vDate, pipe, minValue, maxValue, transform, unknown as vUnknown, safeParse, type PipeAction } from 'valibot'
+import { date as vDate, minValue, maxValue, safeParse, type PipeAction, type BaseIssue } from 'valibot'
 
 import { createInitialState, createOptionalMethods, withAction } from '../core/state.js'
 import { createStandardSchema, toStandardResult } from '../core/standard.js'
@@ -15,24 +15,26 @@ function coerceToDate(val: unknown): unknown {
   return val
 }
 
+type DateAction = PipeAction<Date, Date, BaseIssue<Date>>
+
 function build(state: CoercibleChainState<Date>): XantoDateSchema {
   function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as any }
+      return { value: state.defaultValue as Date }
     }
 
     const valibotSchema = resolveValibotSchema(vDate, state, coerceToDate)
     return toStandardResult(safeParse(valibotSchema, value))
   }
 
-  const chain = (action: PipeAction<any, any, any>) => build(withAction(state, action))
+  const chain = (action: DateAction) => build(withAction(state, action))
 
   return {
     ...createStandardSchema<Date | string, Date>(validate),
 
-    min: (minDate, msg) => chain(minValue(minDate, msg)) as any,
-    max: (maxDate, msg) => chain(maxValue(maxDate, msg)) as any,
-    coerce: () => build({ ...state, isCoerce: true }) as any,
+    min: (minDate, msg) => chain(minValue(minDate, msg)),
+    max: (maxDate, msg) => chain(maxValue(maxDate, msg)),
+    coerce: () => build({ ...state, isCoerce: true }),
 
     ...createOptionalMethods(state, build),
   }

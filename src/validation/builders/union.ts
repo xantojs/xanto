@@ -5,13 +5,13 @@ import type { StandardSchemaV1, StandardIssue } from '../../types/schema.types.j
 import type { ChainState } from '../types/chainState.types.js'
 import type { XantoUnionSchema, InferUnionInput, InferUnionOutput } from '../types/chain.types.js'
 
-function build<const T extends readonly StandardSchemaV1<any, any>[]>(
+function build<const T extends readonly StandardSchemaV1[]>(
   options: T,
   state: ChainState<InferUnionOutput<T>>
 ): XantoUnionSchema<T> {
   async function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as any }
+      return { value: state.defaultValue as InferUnionOutput<T> }
     }
 
     const allIssues: StandardIssue[] = []
@@ -43,6 +43,6 @@ function build<const T extends readonly StandardSchemaV1<any, any>[]>(
   }
 }
 
-export function union<const T extends readonly StandardSchemaV1<any, any>[]>(options: T, message?: string): XantoUnionSchema<T> {
+export function union<const T extends readonly StandardSchemaV1[]>(options: T, message?: string): XantoUnionSchema<T> {
   return build(options, createInitialState(message))
 }

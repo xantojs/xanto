@@ -7,7 +7,7 @@ import type { ObjectShape, InferObjectInput, InferObjectOutput, XantoObjectSchem
 function build<Shape extends ObjectShape>(shape: Shape, state: ChainState<InferObjectOutput<Shape>>): XantoObjectSchema<Shape> {
   async function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as any }
+      return { value: state.defaultValue as InferObjectOutput<Shape> }
     }
 
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
@@ -16,7 +16,7 @@ function build<Shape extends ObjectShape>(shape: Shape, state: ChainState<InferO
       }
     }
 
-    const output: Record<string, any> = {}
+    const output: Record<string, unknown> = {}
     const issues: { message: string; path?: (string | number)[] }[] = []
     const record = value as Record<string, unknown>
 
@@ -40,7 +40,7 @@ function build<Shape extends ObjectShape>(shape: Shape, state: ChainState<InferO
       return { issues }
     }
 
-    return { value: output as InferObjectOutput<Shape> }
+    return { value: output as unknown as InferObjectOutput<Shape> }
   }
 
   return {

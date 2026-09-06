@@ -11,7 +11,7 @@ interface ArrayChainState<T> extends ChainState<T[]> {
   exactLength?: number
 }
 
-function build<ItemSchema extends StandardSchemaV1<any, any>>(
+function build<ItemSchema extends StandardSchemaV1>(
   itemSchema: ItemSchema,
   state: ArrayChainState<InferOutput<ItemSchema>>
 ): XantoArraySchema<InferInput<ItemSchema>, InferOutput<ItemSchema>> {
@@ -82,7 +82,7 @@ function build<ItemSchema extends StandardSchemaV1<any, any>>(
   }
 }
 
-export function array<ItemSchema extends StandardSchemaV1<any, any>>(
+export function array<ItemSchema extends StandardSchemaV1>(
   itemSchema: ItemSchema,
   message?: string
 ): XantoArraySchema<InferInput<ItemSchema>, InferOutput<ItemSchema>> {

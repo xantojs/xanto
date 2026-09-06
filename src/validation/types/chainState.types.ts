@@ -1,12 +1,12 @@
-import type { PipeAction } from 'valibot'
+import type { PipeAction, BaseIssue } from 'valibot'
 
-export interface ChainState<Output> {
-  readonly actions: readonly PipeAction<any, any, any>[]
+export interface ChainState<TInput, TOutput = TInput> {
+  readonly actions: readonly PipeAction<TInput, TOutput, BaseIssue<TInput>>[]
   readonly isOptional: boolean
-  readonly defaultValue: Output | undefined
+  readonly defaultValue: unknown
   readonly message: string | undefined
 }
 
-export interface CoercibleChainState<Output> extends ChainState<Output> {
+export interface CoercibleChainState<TOutput, TInput = TOutput> extends ChainState<TInput, TOutput> {
   isCoerce?: boolean
 }

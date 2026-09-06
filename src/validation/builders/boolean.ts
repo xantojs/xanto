@@ -16,7 +16,7 @@ function coerceToBoolean(val: unknown): unknown {
 function build(state: CoercibleChainState<boolean>): XantoBooleanSchema {
   function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as any }
+      return { value: state.defaultValue as boolean }
     }
 
     const valibotSchema = resolveValibotSchema(vBoolean, state, coerceToBoolean)

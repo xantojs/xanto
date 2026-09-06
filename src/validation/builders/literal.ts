@@ -11,7 +11,7 @@ function build<const T extends string | number | boolean>(expectedValue: T, stat
 
   function validate(value: unknown) {
     if (value === undefined && state.isOptional) {
-      return { value: state.defaultValue as any }
+      return { value: state.defaultValue as T }
     }
     return toStandardResult(safeParse(valibotSchema, value))
   }

@@ -3,13 +3,22 @@ import type { BaseSchema, BaseIssue } from 'valibot'
 
 import type { CoercibleChainState } from '../types/chainState.types.js'
 
+const buildPipe = pipe as unknown as (...parts: unknown[]) => BaseSchema<unknown, unknown, BaseIssue<unknown>>
+
 export function resolveValibotSchema<Output>(
-  baseFactory: (message?: string) => BaseSchema<any, Output, BaseIssue<unknown>>,
+  baseFactory: (message?: string) => BaseSchema<unknown, Output, BaseIssue<unknown>>,
   state: CoercibleChainState<Output>,
   coerceFn?: (value: unknown) => unknown
-): any {
+): BaseSchema<unknown, Output, BaseIssue<unknown>> {
   if (state.isCoerce && coerceFn) {
-    return (pipe as any)(vUnknown(), transform(coerceFn), baseFactory(state.message), ...state.actions)
+    return buildPipe(vUnknown(), transform(coerceFn), baseFactory(state.message), ...state.actions) as unknown as BaseSchema<
+      unknown,
+      Output,
+      BaseIssue<unknown>
+    >
   }
-  return state.actions.length > 0 ? (pipe as any)(baseFactory(state.message), ...state.actions) : baseFactory(state.message)
+  if (state.actions.length > 0) {
+    return buildPipe(baseFactory(state.message), ...state.actions) as unknown as BaseSchema<unknown, Output, BaseIssue<unknown>>
+  }
+  return baseFactory(state.message)
 }
