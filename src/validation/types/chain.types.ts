@@ -122,3 +122,29 @@ export interface XantoObjectSchema<Shape extends ObjectShape> extends XantoSchem
   optional<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>
   default<D>(defaultValue: D): XantoSchema<InferObjectInput<Shape> | undefined, InferObjectOutput<Shape> | D>
 }
+
+export interface XantoNullableSchema<T extends StandardSchemaV1> extends XantoSchema<
+  InferInput<T> | null,
+  InferOutput<T> | null
+> {
+  readonly schema: T
+}
+
+export interface XantoTransformSchema<T extends StandardSchemaV1, TOutput> extends XantoSchema<InferInput<T>, TOutput> {}
+
+export type TupleShape = readonly StandardSchemaV1[]
+
+export type InferTupleInput<T extends TupleShape> = { [K in keyof T]: InferInput<T[K]> }
+export type InferTupleOutput<T extends TupleShape> = { [K in keyof T]: InferOutput<T[K]> }
+
+export interface XantoTupleSchema<T extends TupleShape> extends XantoSchema<InferTupleInput<T>, InferTupleOutput<T>> {
+  readonly items: T
+}
+
+export interface XantoRecordSchema<K extends StandardSchemaV1, V extends StandardSchemaV1> extends XantoSchema<
+  Record<string, InferInput<V>>,
+  Record<string, InferOutput<V>>
+> {
+  readonly keySchema: K
+  readonly valueSchema: V
+}
