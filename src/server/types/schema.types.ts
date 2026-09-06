@@ -1,52 +1,32 @@
-export type InferSchema<T> = T extends { '~standard': { types: { output: infer O } } }
-  ? O extends Record<string, unknown>
-    ? O
+import type { StandardSchemaV1, InferOutput } from '../../types/schema.types.js'
+
+export type InferSchema<T> = T extends StandardSchemaV1
+  ? InferOutput<T> extends Record<string, unknown>
+    ? InferOutput<T>
     : Record<string, unknown>
-  : T extends { _output: infer O }
-    ? O extends Record<string, unknown>
-      ? O
-      : Record<string, unknown>
-    : T extends { _type: infer O }
-      ? O extends Record<string, unknown>
-        ? O
-        : Record<string, unknown>
-      : Record<string, unknown>
+  : Record<string, unknown>
 
-export type InferHeadersSchema<T> = T extends { '~standard': { types: { output: infer O } } }
-  ? O extends Record<string, string | undefined>
-    ? O
+export type InferHeadersSchema<T> = T extends StandardSchemaV1
+  ? InferOutput<T> extends Record<string, string | undefined>
+    ? InferOutput<T>
     : Record<string, string | undefined>
-  : T extends { _output: infer O }
-    ? O extends Record<string, string | undefined>
-      ? O
-      : Record<string, string | undefined>
-    : T extends { _type: infer O }
-      ? O extends Record<string, string | undefined>
-        ? O
-        : Record<string, string | undefined>
-      : Record<string, string | undefined>
+  : Record<string, string | undefined>
 
-export type InferBodySchema<T> = T extends { '~standard': { types: { output: infer O } } }
-  ? O
-  : T extends { _output: infer O }
-    ? O
-    : T extends { _type: infer O }
-      ? O
-      : T extends undefined
-        ? unknown
-        : T
+export type InferBodySchema<T> = T extends StandardSchemaV1
+  ? InferOutput<T>
+  : T extends undefined
+    ? unknown
+    : T
 
 export interface SafeRouteSchema {
-  params?: unknown
-  query?: unknown
-  headers?: unknown
+  params?: StandardSchemaV1 | undefined
+  query?: StandardSchemaV1 | undefined
+  headers?: StandardSchemaV1 | undefined
+  state?: StandardSchemaV1 | undefined
 }
 
-export interface BodyRouteSchema {
-  params?: unknown
-  query?: unknown
-  headers?: unknown
-  body?: unknown
+export interface BodyRouteSchema extends SafeRouteSchema {
+  body?: StandardSchemaV1 | undefined
 }
 
 export type RouteSchema = SafeRouteSchema | BodyRouteSchema

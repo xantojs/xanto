@@ -5,28 +5,33 @@ import type { RouteSchema, SafeRouteSchema, BodyRouteSchema, InferSchema, InferH
 
 export type { RouteSchema, SafeRouteSchema, BodyRouteSchema, InferSchema, InferHeadersSchema, InferBodySchema }
 
-export type SafeHandler<TSchema extends SafeRouteSchema, TState extends object> = (
-  ctx: SafeContext<InferSchema<TSchema['params']>, InferSchema<TSchema['query']>, InferHeadersSchema<TSchema['headers']>, TState>
+export type SafeHandler<TSchema extends SafeRouteSchema> = (
+  ctx: SafeContext<
+    InferSchema<TSchema['params']>,
+    InferSchema<TSchema['query']>,
+    InferHeadersSchema<TSchema['headers']>,
+    InferSchema<TSchema['state']>
+  >
 ) => Promise<unknown> | unknown
 
-export type BodyHandler<TSchema extends BodyRouteSchema, TState extends object> = (
+export type BodyHandler<TSchema extends BodyRouteSchema> = (
   ctx: BodyContext<
     InferBodySchema<TSchema['body']>,
     InferSchema<TSchema['params']>,
     InferSchema<TSchema['query']>,
     InferHeadersSchema<TSchema['headers']>,
-    TState
+    InferSchema<TSchema['state']>
   >
 ) => Promise<unknown> | unknown
 
-export interface SafeRouteOptions<TSchema extends SafeRouteSchema = SafeRouteSchema, TState extends object = Record<string, unknown>> {
+export interface SafeRouteOptions<TSchema extends SafeRouteSchema = SafeRouteSchema> {
   schema?: TSchema | undefined
-  handler: SafeHandler<TSchema, TState>
+  handler: SafeHandler<TSchema>
 }
 
-export interface BodyRouteOptions<TSchema extends BodyRouteSchema = BodyRouteSchema, TState extends object = Record<string, unknown>> {
+export interface BodyRouteOptions<TSchema extends BodyRouteSchema = BodyRouteSchema> {
   schema?: TSchema | undefined
-  handler: BodyHandler<TSchema, TState>
+  handler: BodyHandler<TSchema>
 }
 
 export interface Route {
@@ -38,4 +43,3 @@ export interface Route {
 export interface ParsedRoute extends Route {
   path: string
 }
-
