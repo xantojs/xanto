@@ -1,5 +1,5 @@
 import type { createServer } from '../server/server.js'
-import type { ServerOptions } from '../server/types/serverOptions.type.js'
+import type { ServerOptions } from '../server/types/serverOptions.types.js'
 
 export interface App {
   start(options?: number | ServerOptions): Promise<ReturnType<typeof createServer>>

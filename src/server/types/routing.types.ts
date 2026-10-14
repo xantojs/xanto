@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import type { Methods } from '../../types/methods.type.js'
+import type { Methods } from '../../types/methods.types.js'
 import type { SafeContext, BodyContext } from './context.types.js'
 import type { RouteSchema, SafeRouteSchema, BodyRouteSchema, InferSchema, InferHeadersSchema, InferBodySchema } from './schema.types.js'
 

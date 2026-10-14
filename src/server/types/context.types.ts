@@ -1,8 +1,8 @@
 import type { H3Event } from 'h3'
-import type { Methods } from '../../types/methods.type.js'
-import type { StateManager } from './stateManager.type.js'
-import type { CookieOptions } from './cookieOptions.type.js'
-import type { HttpStatusCode } from './httpStatusCode.type.js'
+import type { Methods } from '../../types/methods.types.js'
+import type { StateManager } from './stateManager.types.js'
+import type { CookieOptions } from './cookieOptions.types.js'
+import type { HttpStatusCode } from './httpStatusCode.types.js'
 
 export interface BaseContext<
   TParams extends Record<string, unknown> = Record<string, unknown>,

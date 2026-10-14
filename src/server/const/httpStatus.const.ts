@@ -1,4 +1,4 @@
-import type { HttpStatusCode } from '../types/httpStatusCode.type.js'
+import type { HttpStatusCode } from '../types/httpStatusCode.types.js'
 
 export const HttpStatus = {
   // 1xx Informational

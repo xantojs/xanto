@@ -1,4 +1,4 @@
-import type { Methods } from '../../types/methods.type.js'
+import type { Methods } from '../../types/methods.types.js'
 import type { ParsedFilename } from '../types/scan.types.js'
 
 const EXTENSION_REGEX = /\.(ts|js|mts|mjs)$/i

@@ -1,4 +1,4 @@
-import type { Methods } from './methods.type.js'
+import type { Methods } from './methods.types.js'
 
 export interface RouteParam {
   name: string

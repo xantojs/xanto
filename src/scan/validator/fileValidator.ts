@@ -1,5 +1,5 @@
 import type { DiscoveredFile, ParsedSegment } from '../types/scan.types.js'
-import type { TrieNode } from '../types/trie.type.js'
+import type { TrieNode } from '../types/trie.types.js'
 import { RouteConflictError } from '../errors/conflict.error.js'
 
 function createTrieNode(segment: ParsedSegment | null = null): TrieNode {

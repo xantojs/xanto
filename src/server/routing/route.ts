@@ -1,4 +1,4 @@
-import type { Methods } from '../../types/methods.type.js'
+import type { Methods } from '../../types/methods.types.js'
 import type { Route, RouteSchema } from '../types/routing.types.js'
 import { createContext } from '../context/contextAdapter.js'
 

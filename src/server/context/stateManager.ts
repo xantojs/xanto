@@ -1,4 +1,4 @@
-import type { StateManager } from '../types/stateManager.type.js'
+import type { StateManager } from '../types/stateManager.types.js'
 
 export class XantoStateManager<TState extends Record<string, unknown>> implements StateManager<TState> {
   private store = new Map<keyof TState, unknown>()

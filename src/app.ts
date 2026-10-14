@@ -2,7 +2,7 @@ import { H3 } from 'h3'
 import { createServer } from './server/server.js'
 import { loadFiles } from './scan/loader.js'
 
-import type { ServerOptions } from './server/types/serverOptions.type.js'
+import type { ServerOptions } from './server/types/serverOptions.types.js'
 import type { App, XantoAppOptions } from './types/app.types.js'
 import { validatePath } from './utils/validatePath.util.js'
 

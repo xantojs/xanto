@@ -1,7 +1,7 @@
 /// <reference types="@types/deno" />
 import { isDeno, isBun, isNode } from 'std-env'
 
-import type { Runtime } from '../../types/runtime.type.js'
+import type { Runtime } from '../../types/runtime.types.js'
 
 export function getProjectRoot(): string {
   if (isDeno) {

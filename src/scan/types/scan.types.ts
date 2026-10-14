@@ -1,4 +1,4 @@
-import type { Methods } from '../../types/methods.type.js'
+import type { Methods } from '../../types/methods.types.js'
 
 export type FileKind = 'route' | 'middleware' | 'error'
 
