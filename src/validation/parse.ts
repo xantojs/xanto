@@ -1,5 +1,5 @@
 import type { StandardSchemaV1, InferOutput } from '../types/schema.types.js'
-import { ValidationError } from './errors.js'
+import { ValidationError } from './errors/index.js'
 
 export async function safeParse<T extends StandardSchemaV1>(schema: T, data: unknown) {
   const res = await schema['~standard'].validate(data)

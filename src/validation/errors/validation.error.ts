@@ -1,5 +1,5 @@
-import type { StandardIssue } from '../types/schema.types.js'
-import type { FlattenedErrors, ValidationErrorJSON } from './types/error.types.js'
+import type { StandardIssue } from '../../types/schema.types.js'
+import type { FlattenedErrors, ValidationErrorJSON } from '../types/error.types.js'
 
 function normalizePath(path?: ReadonlyArray<PropertyKey | { key: PropertyKey }>): (string | number)[] {
   if (!path || path.length === 0) return []

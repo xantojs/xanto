@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ValidationError } from './errors.js'
+import { ValidationError } from './errors/index.js'
 import type { StandardIssue } from '../types/schema.types.js'
 
 describe('ValidationError', () => {
