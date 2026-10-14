@@ -1,50 +1,53 @@
-import { basename, join } from 'pathe'
+import { join } from 'pathe'
 
-import { scanFiles } from './scanner.js'
+import { scanRoutes } from './scanner.js'
 import { importModules } from './importer.js'
-import { parseRoute } from './parser.js'
-
 import { getProjectRoot } from './utils/runtime.util.js'
-import { extractMethod } from './utils/extractor.util.js'
 
-import type { Methods } from '../types/methods.type.js'
+import type { ParsedRoute } from '../server/types/routing.types.js'
 
-export async function loadFiles(routesDir: string = 'routes', basePath: string = 'src') {
+export async function loadFiles(
+  routesDir: string = 'routes',
+  basePath: string = 'src'
+): Promise<ParsedRoute[] | undefined> {
   const projectRoot = getProjectRoot()
   const entryDir = join(projectRoot, basePath)
-  const routesRoot = join(entryDir, routesDir)
 
-  const files = await scanFiles(routesDir, entryDir)
-  if (files.length === 0) {
+  const scannedRoutes = await scanRoutes(routesDir, entryDir)
+  if (scannedRoutes.length === 0) {
     console.error(`No route files found in: ${join(entryDir, routesDir)}`)
     return
   }
 
-  const validRoutes = files.flatMap((file) => {
-    const method = extractMethod(basename(file))
+  const filePaths = scannedRoutes.map((r) => r.filePath)
+  const imported = await importModules(filePaths)
 
-    return method ? [{ file, method }] : []
-  })
-  if (validRoutes.length === 0) return
+  const moduleMap = new Map<string, any>()
+  for (let i = 0; i < imported.length; i++) {
+    const item = imported[i]!
+    if (!item.error && item.module) {
+      moduleMap.set(item.file, item.module)
+    }
+  }
 
-  const methodMap = new Map<string, Methods>(validRoutes.map(({ file, method }) => [file, method]))
+  const routes: ParsedRoute[] = []
 
-  const imported = await importModules(validRoutes.map(({ file }) => file))
+  for (let i = 0; i < scannedRoutes.length; i++) {
+    const scanned = scannedRoutes[i]!
+    const mod = moduleMap.get(scanned.filePath)
 
-  const routes = imported
-    .filter(({ error }) => !error)
-    .flatMap(({ file, module }) => {
-      const method = methodMap.get(file)!
+    if (!mod || !mod.default) {
+      continue
+    }
 
-      if (!method) return []
-
-      const route = parseRoute(file, routesRoot, method, module)
-
-      return route ? [route] : []
+    routes.push({
+      path: scanned.path,
+      method: scanned.method,
+      handler: mod.default,
     })
 
-  routes.forEach(({ path, method }) => {
-    console.log(`✅ [${method}] ${path}`)
-  })
+    console.log(`✅ [${scanned.method}] ${scanned.path}`)
+  }
+
   return routes
 }

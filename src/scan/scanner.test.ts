@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { mkdir, writeFile, rm } from 'node:fs/promises'
 import { join, normalize } from 'pathe'
-import { scanFiles } from './scanner.js'
+import { scanFiles, scanRoutes } from './scanner.js'
 
 const FIXTURES_DIR = join(import.meta.dirname, '__test_fixtures__')
 
@@ -65,5 +65,28 @@ describe('scanFiles', () => {
   it('should return empty array for non-existent directory', async () => {
     const files = await scanFiles('non_existing_dir', FIXTURES_DIR)
     expect(files).toEqual([])
+  })
+
+  it('should scan and build validated routes via scanRoutes pipeline', async () => {
+    const routes = await scanRoutes('routes', FIXTURES_DIR)
+
+    expect(routes.length).toBe(6)
+
+    const dashboard = routes.find((r) => r.path === '/dashboard')
+    expect(dashboard).toBeDefined()
+    expect(dashboard?.method).toBe('GET')
+    expect(dashboard?.middlewares).toEqual([
+      join(FIXTURES_DIR, 'routes/middleware.ts'),
+    ])
+    expect(dashboard?.errorHandler).toBe(join(FIXTURES_DIR, 'routes/error.ts'))
+
+    const userDelete = routes.find((r) => r.path === '/users/:id' && r.method === 'DELETE')
+    expect(userDelete).toBeDefined()
+    expect(userDelete?.params).toEqual([{ name: 'id', isCatchAll: false }])
+    expect(userDelete?.middlewares).toEqual([
+      join(FIXTURES_DIR, 'routes/middleware.ts'),
+      join(FIXTURES_DIR, 'routes/users/auth.middleware.ts'),
+    ])
+    expect(userDelete?.errorHandler).toBe(join(FIXTURES_DIR, 'routes/users/validation.error.ts'))
   })
 })
