@@ -1,5 +1,6 @@
 import type { DiscoveredFile, ParsedSegment } from '../types/scan.types.js'
 import type { TrieNode } from '../types/trie.type.js'
+import { RouteConflictError } from '../errors/conflict.error.js'
 
 function createTrieNode(segment: ParsedSegment | null = null): TrieNode {
   return {
@@ -26,15 +27,17 @@ export function validateDiscoveredFiles(files: DiscoveredFile[]): void {
       const seg = segments[s]!
 
       if (seg.type === 'catch-all' && s !== segments.length - 1) {
-        throw new Error(
-          `Catch-all segment "${seg.raw}" must be the terminal segment. Found child segments in "${relativePath}".`
+        throw new RouteConflictError(
+          `Catch-all segment "${seg.raw}" must be the terminal segment. Found child segments in "${relativePath}".`,
+          relativePath
         )
       }
 
       if (seg.paramName) {
         if (seenParams.has(seg.paramName)) {
-          throw new Error(
-            `Duplicate parameter name "${seg.paramName}" in path "${relativePath}".`
+          throw new RouteConflictError(
+            `Duplicate parameter name "${seg.paramName}" in path "${relativePath}".`,
+            relativePath
           )
         }
         seenParams.add(seg.paramName)
@@ -54,22 +57,25 @@ export function validateDiscoveredFiles(files: DiscoveredFile[]): void {
 
         if (seg.type === 'dynamic') {
           if (current.dynamicChild && current.dynamicChild.segment?.raw.toLowerCase() !== segKey) {
-            throw new Error(
-              `Sibling dynamic segment conflict: "${current.dynamicChild.segment?.raw}" and "${seg.raw}" in path "${relativePath}".`
+            throw new RouteConflictError(
+              `Sibling dynamic segment conflict: "${current.dynamicChild.segment?.raw}" and "${seg.raw}" in path "${relativePath}".`,
+              relativePath
             )
           }
           current.dynamicChild = next
         } else if (seg.type === 'typed-dynamic') {
           if (current.typedDynamicChild && current.typedDynamicChild.segment?.raw.toLowerCase() !== segKey) {
-            throw new Error(
-              `Sibling typed dynamic segment conflict: "${current.typedDynamicChild.segment?.raw}" and "${seg.raw}" in path "${relativePath}".`
+            throw new RouteConflictError(
+              `Sibling typed dynamic segment conflict: "${current.typedDynamicChild.segment?.raw}" and "${seg.raw}" in path "${relativePath}".`,
+              relativePath
             )
           }
           current.typedDynamicChild = next
         } else if (seg.type === 'catch-all') {
           if (current.catchAllChild && current.catchAllChild.segment?.raw.toLowerCase() !== segKey) {
-            throw new Error(
-              `Sibling catch-all segment conflict: "${current.catchAllChild.segment?.raw}" and "${seg.raw}" in path "${relativePath}".`
+            throw new RouteConflictError(
+              `Sibling catch-all segment conflict: "${current.catchAllChild.segment?.raw}" and "${seg.raw}" in path "${relativePath}".`,
+              relativePath
             )
           }
           current.catchAllChild = next
@@ -97,21 +103,24 @@ export function validateDiscoveredFiles(files: DiscoveredFile[]): void {
     }
 
     if (filename.kind === 'middleware' && hasMiddleware) {
-      throw new Error(
-        `Multiple middleware files detected in the same directory: "${relativePath}".`
+      throw new RouteConflictError(
+        `Multiple middleware files detected in the same directory: "${relativePath}".`,
+        relativePath
       )
     }
 
     if (filename.kind === 'error' && hasError) {
-      throw new Error(
-        `Multiple error files detected in the same directory: "${relativePath}".`
+      throw new RouteConflictError(
+        `Multiple error files detected in the same directory: "${relativePath}".`,
+        relativePath
       )
     }
 
     if (filename.kind === 'route' && filename.method) {
       if (existingMethods.has(filename.method)) {
-        throw new Error(
-          `Duplicate HTTP method "${filename.method}" in directory: "${relativePath}".`
+        throw new RouteConflictError(
+          `Duplicate HTTP method "${filename.method}" in directory: "${relativePath}".`,
+          relativePath
         )
       }
 
@@ -136,8 +145,9 @@ export function validateDiscoveredFiles(files: DiscoveredFile[]): void {
 
       const conflictingPath = resolvedRouteUrls.get(routeKey)
       if (conflictingPath) {
-        throw new Error(
-          `Route conflict: "${routeKey}" is defined by both "${conflictingPath}" and "${relativePath}".`
+        throw new RouteConflictError(
+          `Route conflict: "${routeKey}" is defined by both "${conflictingPath}" and "${relativePath}".`,
+          relativePath
         )
       }
       resolvedRouteUrls.set(routeKey, relativePath)

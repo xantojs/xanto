@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { parseSegment } from './segmentParser.js'
+import { SegmentSyntaxError } from '../errors/syntax.error.js'
 
 describe('parseSegment', () => {
   it('parses static segments and lowercases them', () => {
@@ -51,9 +52,9 @@ describe('parseSegment', () => {
     })
   })
 
-  it('throws on empty group segment', () => {
-    expect(() => parseSegment('()')).toThrow(/Invalid empty route group/)
-    expect(() => parseSegment('(   )')).toThrow(/Invalid empty route group/)
+  it('throws SegmentSyntaxError on empty group segment', () => {
+    expect(() => parseSegment('()')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('(   )')).toThrow(SegmentSyntaxError)
   })
 
   it('parses dynamic segments [id]', () => {
@@ -79,9 +80,9 @@ describe('parseSegment', () => {
     })
   })
 
-  it('throws on empty dynamic brackets []', () => {
-    expect(() => parseSegment('[]')).toThrow(/Invalid empty parameter syntax/)
-    expect(() => parseSegment('[   ]')).toThrow(/Invalid empty parameter syntax/)
+  it('throws SegmentSyntaxError on empty dynamic brackets []', () => {
+    expect(() => parseSegment('[]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[   ]')).toThrow(SegmentSyntaxError)
   })
 
   it('parses typed dynamic segments [id::type]', () => {
@@ -110,11 +111,11 @@ describe('parseSegment', () => {
     })
   })
 
-  it('throws on malformed typed dynamic segments', () => {
-    expect(() => parseSegment('[id::]')).toThrow(/Invalid typed parameter syntax/)
-    expect(() => parseSegment('[::number]')).toThrow(/Invalid typed parameter syntax/)
-    expect(() => parseSegment('[id::number::extra]')).toThrow(/Invalid typed parameter syntax/)
-    expect(() => parseSegment('[  ::  ]')).toThrow(/Invalid typed parameter syntax/)
+  it('throws SegmentSyntaxError on malformed typed dynamic segments', () => {
+    expect(() => parseSegment('[id::]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[::number]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[id::number::extra]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[  ::  ]')).toThrow(SegmentSyntaxError)
   })
 
   it('parses catch-all segments [...slug]', () => {
@@ -133,12 +134,12 @@ describe('parseSegment', () => {
     })
   })
 
-  it('rejects anonymous catch-all [...] per Section 8 of spec', () => {
-    expect(() => parseSegment('[...]')).toThrow(/Anonymous catch-all segment/)
-    expect(() => parseSegment('[...  ]')).toThrow(/Anonymous catch-all segment/)
+  it('rejects anonymous catch-all [...] with SegmentSyntaxError per Section 8 of spec', () => {
+    expect(() => parseSegment('[...]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[...  ]')).toThrow(SegmentSyntaxError)
   })
 
-  it('rejects typed catch-all [...slug::number] per Section 8 of spec', () => {
-    expect(() => parseSegment('[...slug::number]')).toThrow(/Typed catch-all segment/)
+  it('rejects typed catch-all [...slug::number] with SegmentSyntaxError per Section 8 of spec', () => {
+    expect(() => parseSegment('[...slug::number]')).toThrow(SegmentSyntaxError)
   })
 })

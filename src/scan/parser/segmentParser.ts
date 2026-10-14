@@ -1,4 +1,5 @@
 import type { ParsedSegment } from '../types/scan.types.js'
+import { SegmentSyntaxError } from '../errors/syntax.error.js'
 
 export function parseSegment(segment: string): ParsedSegment {
   const raw = segment.trim()
@@ -7,7 +8,7 @@ export function parseSegment(segment: string): ParsedSegment {
   if (lower.startsWith('(') && lower.endsWith(')')) {
     const groupName = lower.slice(1, -1).trim()
     if (!groupName) {
-      throw new Error(`Invalid empty route group segment: "${raw}"`)
+      throw new SegmentSyntaxError(`Invalid empty route group segment: "${raw}"`, raw)
     }
     return {
       raw,
@@ -22,10 +23,10 @@ export function parseSegment(segment: string): ParsedSegment {
     if (inner.startsWith('...')) {
       const paramName = inner.slice(3).trim()
       if (!paramName) {
-        throw new Error(`Anonymous catch-all segment "[...]" is not supported: "${raw}"`)
+        throw new SegmentSyntaxError(`Anonymous catch-all segment "[...]" is not supported: "${raw}"`, raw)
       }
       if (paramName.includes('::')) {
-        throw new Error(`Typed catch-all segment "[...name::type]" is not supported: "${raw}"`)
+        throw new SegmentSyntaxError(`Typed catch-all segment "[...name::type]" is not supported: "${raw}"`, raw)
       }
       return {
         raw,
@@ -38,13 +39,13 @@ export function parseSegment(segment: string): ParsedSegment {
     if (inner.includes('::')) {
       const parts = inner.split('::')
       if (parts.length !== 2) {
-        throw new Error(`Invalid typed parameter syntax: "${raw}"`)
+        throw new SegmentSyntaxError(`Invalid typed parameter syntax: "${raw}"`, raw)
       }
       const paramName = parts[0]!.trim()
       const paramType = parts[1]!.trim()
 
       if (!paramName || !paramType) {
-        throw new Error(`Invalid typed parameter syntax: "${raw}"`)
+        throw new SegmentSyntaxError(`Invalid typed parameter syntax: "${raw}"`, raw)
       }
 
       return {
@@ -58,7 +59,7 @@ export function parseSegment(segment: string): ParsedSegment {
 
     const paramName = inner
     if (!paramName) {
-      throw new Error(`Invalid empty parameter syntax: "${raw}"`)
+      throw new SegmentSyntaxError(`Invalid empty parameter syntax: "${raw}"`, raw)
     }
 
     return {
