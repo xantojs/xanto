@@ -1,4 +1,4 @@
-import { GET } from '@xanto/core/routing'
+import { GET } from '@xanto/core/server/routing'
 
 export default GET({
     handler(ctx) {

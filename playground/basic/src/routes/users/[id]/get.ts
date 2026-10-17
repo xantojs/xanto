@@ -1,4 +1,4 @@
-import { GET } from '@xanto/core/routing'
+import { GET } from '@xanto/core/server/routing'
 import { x } from '@xanto/core/validation'
 
 export default GET({
