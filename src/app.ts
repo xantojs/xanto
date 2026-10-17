@@ -1,4 +1,3 @@
-import { H3 } from 'h3'
 import { createServer } from './server/server.js'
 import { loadFiles } from './scan/loader.js'
 
@@ -10,13 +9,12 @@ export function createApp(appOptions?: XantoAppOptions): App {
   if (appOptions?.routesDir) validatePath(appOptions.routesDir)
   if (appOptions?.basePath) validatePath(appOptions.basePath)
 
-  const h3 = new H3()
-
   const app = {
     async start(serverOptions?: number | ServerOptions) {
       const opts = typeof serverOptions === 'number' ? { port: serverOptions } : serverOptions
-      loadFiles(appOptions?.routesDir, appOptions?.basePath)
-      return createServer(h3, opts)
+      const routes = await loadFiles(appOptions?.routesDir, appOptions?.basePath)
+      console.log(routes)
+      return createServer(routes ?? [], opts)
     },
   }
 
