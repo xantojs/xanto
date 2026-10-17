@@ -18,7 +18,12 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./routing": {
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js",
+      "default": "./dist/server/index.js"
+    },
+    "./server/routing": {
       "types": "./dist/server/routing/index.d.ts",
       "import": "./dist/server/routing/index.js",
       "default": "./dist/server/routing/index.js"
