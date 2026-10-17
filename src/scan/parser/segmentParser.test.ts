@@ -122,14 +122,14 @@ describe('parseSegment', () => {
     expect(parseSegment('[...slug]')).toEqual({
       raw: '[...slug]',
       type: 'catch-all',
-      value: '**',
+      value: '**:slug',
       paramName: 'slug',
     })
 
     expect(parseSegment('[...FILE_PATH]')).toEqual({
       raw: '[...FILE_PATH]',
       type: 'catch-all',
-      value: '**',
+      value: '**:file_path',
       paramName: 'file_path',
     })
   })

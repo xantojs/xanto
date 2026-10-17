@@ -38,7 +38,7 @@ export function parseSegment(segment: string): ParsedSegment {
       return {
         raw,
         type: 'catch-all',
-        value: '**',
+        value: `**:${paramName}`,
         paramName,
       }
     }

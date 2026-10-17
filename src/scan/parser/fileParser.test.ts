@@ -55,7 +55,7 @@ describe('parseFile', () => {
       segments: [
         { raw: '(admin)', type: 'group', value: null },
         { raw: 'docs', type: 'static', value: 'docs' },
-        { raw: '[...slug]', type: 'catch-all', value: '**', paramName: 'slug' },
+        { raw: '[...slug]', type: 'catch-all', value: '**:slug', paramName: 'slug' },
       ],
     })
   })

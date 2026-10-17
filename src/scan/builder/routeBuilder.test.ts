@@ -72,7 +72,7 @@ describe('buildRoutes', () => {
 
     expect(routes).toHaveLength(1)
     expect(routes[0]).toEqual({
-      path: '/docs/**',
+      path: '/docs/**:slug',
       method: 'GET',
       filePath: '/root/(admin)/docs/[...slug]/get.ts',
       params: [
@@ -157,7 +157,7 @@ describe('buildRoutes', () => {
       '/users/settings',
       '/users/:id',
       '/users/:id',
-      '/users/**',
+      '/users/**:slug',
     ])
 
     expect(routes[0]?.priority).toBeGreaterThan(routes[1]?.priority!)
