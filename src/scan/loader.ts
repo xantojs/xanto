@@ -51,7 +51,8 @@ export async function loadFiles(
     routes.push({
       path: scanned.path,
       method: scanned.method,
-      handler: mod.default,
+      schema: routeDef?.schema,
+      handler: typeof routeDef?.handler === 'function' ? routeDef.handler : routeDef,
     })
 
     console.log(`✅ [${scanned.method}] ${scanned.path}`)
