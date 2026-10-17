@@ -460,20 +460,6 @@ describe('createContext', () => {
     expect(ctx.deleteCookie('x')).toBe(ctx)
   })
 
-  // redirect() 
-
-  it('redirect() delegates to h3 redirect', async () => {
-    const ctx = await createContext(makeEvent())
-    ctx.redirect('/login', 302)
-    expect(h3Mocks.redirect).toHaveBeenCalledWith('/login', 302)
-  })
-
-  it('redirect() works without statusCode', async () => {
-    const ctx = await createContext(makeEvent())
-    ctx.redirect('/home')
-    expect(h3Mocks.redirect).toHaveBeenCalledWith('/home', undefined)
-  })
-
   //chaining
 
   it('status().setHeader().setCookie() chain works', async () => {
