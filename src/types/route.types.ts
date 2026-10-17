@@ -20,3 +20,11 @@ export interface ScannedRoute {
 export interface RouteManifest {
   routes: ScannedRoute[]
 }
+
+export interface ParsedRoute {
+  path: string
+  method: Methods
+  schema?: unknown
+  handler: (...args: any[]) => any
+}
+

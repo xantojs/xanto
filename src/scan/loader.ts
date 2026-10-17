@@ -5,7 +5,7 @@ import { scanRoutes } from './scanner.js'
 import { importModules } from './importer.js'
 import { getProjectRoot } from './utils/runtime.util.js'
 
-import type { ParsedRoute } from '../server/types/routing.types.js'
+import type { ParsedRoute } from '../types/route.types.js'
 
 export async function loadFiles(
   routesDir: string = 'routes',

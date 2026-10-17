@@ -39,7 +39,3 @@ export interface Route {
   schema?: RouteSchema | undefined
   handler: (event: H3Event) => Promise<unknown>
 }
-
-export interface ParsedRoute extends Route {
-  path: string
-}
