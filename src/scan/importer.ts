@@ -14,9 +14,7 @@ export async function importModules(files: string[]): Promise<ImporterModule[]> 
         file,
         module,
       })
-    } catch (error) {
-      console.error(`Failed to import ${file}:`, error)
-
+    } catch (error) { 
       results.push({
         file,
         module: null,
