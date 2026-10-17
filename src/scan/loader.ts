@@ -53,6 +53,9 @@ export async function loadFiles(
       method: scanned.method,
       schema: def.schema,
       handler: def.handler,
+      ...(scanned.params.length > 0 && { params: scanned.params }),
+      ...(scanned.middlewares && { middlewares: scanned.middlewares }),
+      ...(scanned.errorHandler && { errorHandler: scanned.errorHandler }),
     })
   }
 

@@ -14,11 +14,6 @@ export interface ScannedRoute {
   priority: number
   middlewares?: string[]
   errorHandler?: string
-  entrypoint?: unknown
-}
-
-export interface RouteManifest {
-  routes: ScannedRoute[]
 }
 
 export interface ParsedRoute {
@@ -26,5 +21,8 @@ export interface ParsedRoute {
   method: Methods
   schema?: unknown
   handler: (...args: any[]) => any
+  params?: RouteParam[]
+  middlewares?: string[]
+  errorHandler?: string
 }
 
