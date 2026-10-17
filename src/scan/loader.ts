@@ -1,5 +1,6 @@
 import { join } from 'pathe'
 
+import { ScanError } from './errors/scan.error.js'
 import { scanRoutes } from './scanner.js'
 import { importModules } from './importer.js'
 import { getProjectRoot } from './utils/runtime.util.js'
@@ -38,6 +39,13 @@ export async function loadFiles(
 
     if (!mod || !mod.default) {
       continue
+    }
+
+    const routeDef = mod.default
+    if (routeDef && typeof routeDef === 'object' && 'method' in routeDef) {
+      if (routeDef.method !== scanned.method) {
+        throw new ScanError(`Method mismatch in ${scanned.filePath}: filename defines ${scanned.method}, but route handler defines ${routeDef.method}`)
+      }
     }
 
     routes.push({
