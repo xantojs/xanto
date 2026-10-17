@@ -5,6 +5,13 @@ export function parseSegment(segment: string): ParsedSegment {
   const raw = segment.trim()
   const lower = raw.toLowerCase()
 
+  if (lower.startsWith('[[') || lower.endsWith(']]')) {
+    throw new SegmentSyntaxError(
+      `Optional segments "${raw}" are not supported. Use separate routes instead.`,
+      raw
+    )
+  }
+
   if (lower.startsWith('(') && lower.endsWith(')')) {
     const groupName = lower.slice(1, -1).trim()
     if (!groupName) {
@@ -57,6 +64,13 @@ export function parseSegment(segment: string): ParsedSegment {
       }
     }
 
+    if (inner.includes('[') || inner.includes(']')) {
+      throw new SegmentSyntaxError(
+        `Multiple or nested parameters in a single segment "${raw}" are not supported.`,
+        raw
+      )
+    }
+
     const paramName = inner
     if (!paramName) {
       throw new SegmentSyntaxError(`Invalid empty parameter syntax: "${raw}"`, raw)
@@ -68,6 +82,13 @@ export function parseSegment(segment: string): ParsedSegment {
       value: `:${paramName}`,
       paramName,
     }
+  }
+
+  if (lower.includes('[') || lower.includes(']')) {
+    throw new SegmentSyntaxError(
+      `Partial dynamic segments or unclosed brackets in "${raw}" are not supported.`,
+      raw
+    )
   }
 
   return {

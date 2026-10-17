@@ -142,4 +142,21 @@ describe('parseSegment', () => {
   it('rejects typed catch-all [...slug::number] with SegmentSyntaxError per Section 8 of spec', () => {
     expect(() => parseSegment('[...slug::number]')).toThrow(SegmentSyntaxError)
   })
+
+  it('rejects optional segments [[name]] per Section 8 of spec', () => {
+    expect(() => parseSegment('[[id]]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[[...slug]]')).toThrow(SegmentSyntaxError)
+  })
+
+  it('rejects multiple parameters in a single segment per Section 8 of spec', () => {
+    expect(() => parseSegment('[width]x[height]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[[width][height]]')).toThrow(SegmentSyntaxError)
+  })
+
+  it('rejects partial dynamic segments and unclosed brackets', () => {
+    expect(() => parseSegment('user-[id]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[id]-user')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[id')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('id]')).toThrow(SegmentSyntaxError)
+  })
 })
