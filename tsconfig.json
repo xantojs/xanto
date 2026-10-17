@@ -4,7 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
 
-    "lib": ["ES2024"],
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
 
     "types": ["node"],
 
@@ -22,14 +22,13 @@
     "declarationMap": true,
     "sourceMap": true,
 
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "noEmit": true,
 
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
 
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
 
   "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.spec.ts"]
 }
