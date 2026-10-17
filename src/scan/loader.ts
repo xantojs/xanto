@@ -7,17 +7,13 @@ import { getProjectRoot } from './utils/runtime.util.js'
 
 import type { ParsedRoute } from '../types/route.types.js'
 
-export async function loadFiles(
-  routesDir: string = 'routes',
-  basePath: string = 'src'
-): Promise<ParsedRoute[] | undefined> {
+export async function loadFiles(routesDir: string = 'routes', basePath: string = 'src'): Promise<ParsedRoute[]> {
   const projectRoot = getProjectRoot()
   const entryDir = join(projectRoot, basePath)
 
   const scannedRoutes = await scanRoutes(routesDir, entryDir)
   if (scannedRoutes.length === 0) {
-    console.error(`No route files found in: ${join(entryDir, routesDir)}`)
-    return
+    throw new ScanError(`No route files found in: ${join(entryDir, routesDir)}`)
   }
 
   const filePaths = scannedRoutes.map((r) => r.filePath)
@@ -26,7 +22,7 @@ export async function loadFiles(
   const moduleMap = new Map<string, any>()
   for (const item of imported) {
     if (item.error) {
-      throw new ScanError(`Failed to import ${item.file}: ${String(item.error)}`)
+      throw new ScanError(`Failed to import ${item.file}: ${item.error.message}`)
     }
     if (item.module) moduleMap.set(item.file, item.module)
   }
@@ -37,9 +33,7 @@ export async function loadFiles(
     const def = moduleMap.get(scanned.filePath)?.default
 
     if (!def || typeof def !== 'object' || typeof def.handler !== 'function') {
-      throw new ScanError(
-        `Invalid default export in ${scanned.filePath}: expected a route created with route()`
-      )
+      throw new ScanError(`Invalid default export in ${scanned.filePath}: expected a route created with route()`)
     }
 
     if (def.method !== scanned.method) {

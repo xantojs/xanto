@@ -13,8 +13,7 @@ export function createApp(appOptions?: XantoAppOptions): App {
     async start(serverOptions?: number | ServerOptions) {
       const opts = typeof serverOptions === 'number' ? { port: serverOptions } : serverOptions
       const routes = await loadFiles(appOptions?.routesDir, appOptions?.basePath)
-      console.log(routes)
-      return createServer(routes ?? [], opts)
+      return createServer(routes, opts)
     },
   }
 
