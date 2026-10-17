@@ -9,8 +9,8 @@ export type SafeHandler<TSchema extends SafeRouteSchema> = (
   ctx: SafeContext<
     InferSchema<TSchema['params']>,
     InferSchema<TSchema['query']>,
-    InferHeadersSchema<TSchema['headers']>,
-    InferSchema<TSchema['state']>
+    InferHeadersSchema<TSchema['headers']>
+    // InferSchema<TSchema['state']>
   >
 ) => Promise<unknown> | unknown
 
@@ -19,8 +19,8 @@ export type BodyHandler<TSchema extends BodyRouteSchema> = (
     InferBodySchema<TSchema['body']>,
     InferSchema<TSchema['params']>,
     InferSchema<TSchema['query']>,
-    InferHeadersSchema<TSchema['headers']>,
-    InferSchema<TSchema['state']>
+    InferHeadersSchema<TSchema['headers']>
+    // InferSchema<TSchema['state']>
   >
 ) => Promise<unknown> | unknown
 

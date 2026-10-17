@@ -22,7 +22,7 @@ export interface SafeRouteSchema {
   params?: StandardSchemaV1 | undefined
   query?: StandardSchemaV1 | undefined
   headers?: StandardSchemaV1 | undefined
-  state?: StandardSchemaV1 | undefined
+  // state?: StandardSchemaV1 | undefined
 }
 
 export interface BodyRouteSchema extends SafeRouteSchema {

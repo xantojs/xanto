@@ -1,6 +1,8 @@
+// TODO(0.2.0): state
+
 import type { H3Event } from 'h3'
 import type { Methods } from '../../types/methods.types.js'
-import type { StateManager } from './stateManager.types.js'
+// import type { StateManager } from './stateManager.types.js'
 import type { CookieOptions } from './cookieOptions.types.js'
 import type { HttpStatusCode } from './httpStatusCode.types.js'
 
@@ -8,7 +10,7 @@ export interface BaseContext<
   TParams extends Record<string, unknown> = Record<string, unknown>,
   TQuery extends Record<string, unknown> = Record<string, unknown>,
   THeaders extends Record<string, string | undefined> = Record<string, string | undefined>,
-  TState extends object = Record<string, unknown>,
+// TState extends object = Record<string, unknown>,
 > {
   readonly params: Readonly<TParams>
   readonly query: Readonly<TQuery>
@@ -27,23 +29,26 @@ export interface BaseContext<
   deleteCookie(name: string, options?: CookieOptions): this
   redirect(location: string, statusCode?: number): void
 
-  readonly state: StateManager<TState>
+  // readonly state: StateManager<TState>
 }
 
 export interface SafeContext<
   TParams extends Record<string, unknown> = Record<string, unknown>,
   TQuery extends Record<string, unknown> = Record<string, unknown>,
   THeaders extends Record<string, string | undefined> = Record<string, string | undefined>,
-  TState extends object = Record<string, unknown>,
-> extends BaseContext<TParams, TQuery, THeaders, TState> {}
+  // TState extends object = Record<string, unknown>,
+> extends BaseContext<TParams, TQuery, THeaders
+// TState
+> { }
 
 export interface BodyContext<
   TBody = unknown,
   TParams extends Record<string, unknown> = Record<string, unknown>,
   TQuery extends Record<string, unknown> = Record<string, unknown>,
   THeaders extends Record<string, string | undefined> = Record<string, string | undefined>,
-  TState extends object = Record<string, unknown>,
-> extends BaseContext<TParams, TQuery, THeaders, TState> {
+  // TState extends object = Record<string, unknown>,
+> extends BaseContext<TParams, TQuery, THeaders // TState
+> {
   readonly body: Readonly<TBody>
 }
 
@@ -52,7 +57,8 @@ export type XantoContext<
   TParams extends Record<string, unknown> = Record<string, unknown>,
   TQuery extends Record<string, unknown> = Record<string, unknown>,
   THeaders extends Record<string, string | undefined> = Record<string, string | undefined>,
-  TState extends object = Record<string, unknown>,
-> = BaseContext<TParams, TQuery, THeaders, TState> & {
+  // TState extends object = Record<string, unknown>,
+> = BaseContext<TParams, TQuery, THeaders // TState
+> & {
   readonly body?: Readonly<TBody> | undefined
 }

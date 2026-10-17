@@ -297,6 +297,7 @@ describe('createContext', () => {
   //  Schema validation - state
 
   it('validates state.entries against schema.state', async () => {
+    /* // TODO(0.2.0): state
     const { XantoStateManager } = await import('./stateManager.js')
     const st = new XantoStateManager<{ role: string }>()
     st.set('role', 'admin')
@@ -305,8 +306,10 @@ describe('createContext', () => {
       state: x.object({ role: x.string() }),
     })
     expect(ctx.state.get('role')).toBe('admin')
+    */
   })
 
+  /* // TODO(0.2.0): state
   it('throws when state does not satisfy schema.state', async () => {
     const { XantoStateManager } = await import('./stateManager.js')
     const st = new XantoStateManager<Record<string, unknown>>()
@@ -353,6 +356,7 @@ describe('createContext', () => {
     const ctx2 = await createContext(event)
     expect(ctx2.state.get('k' as any)).toBe('v')
   })
+  */
 
   //  status()
 
