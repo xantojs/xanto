@@ -2,6 +2,7 @@ import { readBody, getCookie, setCookie, deleteCookie, getQuery, redirect, getRe
 
 import type { StandardSchemaV1 } from '../../types/schema.types.js'
 import { XantoStateManager } from './stateManager.js'
+import { RequestValidationError } from '../errors/requestValidation.error.js'
 import type { XantoContext } from '../types/context.types.js'
 import type { RouteSchema } from '../types/routing.types.js'
 
@@ -14,10 +15,7 @@ function getOrCreateState<TState extends Record<string, unknown>>(event: H3Event
 
 async function validateSchema<T extends StandardSchemaV1>(schema: T, data: unknown): Promise<StandardSchemaV1.InferOutput<T>> {
   const result = await schema['~standard'].validate(data)
-  if (result.issues) {
-    const message = result.issues.map((i) => i.message).join('; ')
-    throw Object.assign(new Error(message), { issues: result.issues })
-  }
+  if (result.issues) throw new RequestValidationError(result.issues)
   return result.value as StandardSchemaV1.InferOutput<T>
 }
 
