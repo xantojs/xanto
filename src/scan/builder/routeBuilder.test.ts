@@ -53,7 +53,7 @@ describe('buildRoutes', () => {
 
     expect(routes).toHaveLength(1)
     expect(routes[0]).toEqual({
-      path: '/users/:id/posts/:slug',
+      path: '/users/:id(\\d+)/posts/:slug',
       method: 'GET',
       filePath: '/root/users/[id::number]/posts/[slug]/get.ts',
       params: [
@@ -155,7 +155,7 @@ describe('buildRoutes', () => {
     const paths = routes.map((r) => r.path)
     expect(paths).toEqual([
       '/users/settings',
-      '/users/:id',
+      '/users/:id(\\d+)',
       '/users/:id',
       '/users/**:slug',
     ])
@@ -168,8 +168,8 @@ describe('buildRoutes', () => {
   it('correctly handles deeply nested complex hierarchies and prefixes', () => {
     const files = buildDiscovered([
       'api/v1/auth/user.login.post.ts',
-      'api/v1/users/[userId::uuid]/avatar.get.ts',
-      'api/v1/users/[userId::uuid]/delete.delete.ts',
+      'api/v1/users/[userId::number]/avatar.get.ts',
+      'api/v1/users/[userId::number]/delete.delete.ts',
     ])
     const routes = buildRoutes(files)
 
@@ -180,11 +180,11 @@ describe('buildRoutes', () => {
     expect(login?.filePath).toBe('/root/api/v1/auth/user.login.post.ts')
 
     const avatar = routes.find((r) => r.method === 'GET')
-    expect(avatar?.path).toBe('/api/v1/users/:userid')
-    expect(avatar?.params).toEqual([{ name: 'userid', type: 'uuid', isCatchAll: false }])
+    expect(avatar?.path).toBe('/api/v1/users/:userid(\\d+)')
+    expect(avatar?.params).toEqual([{ name: 'userid', type: 'number', isCatchAll: false }])
 
     const del = routes.find((r) => r.method === 'DELETE')
-    expect(del?.path).toBe('/api/v1/users/:userid')
-    expect(del?.params).toEqual([{ name: 'userid', type: 'uuid', isCatchAll: false }])
+    expect(del?.path).toBe('/api/v1/users/:userid(\\d+)')
+    expect(del?.params).toEqual([{ name: 'userid', type: 'number', isCatchAll: false }])
   })
 })

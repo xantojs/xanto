@@ -1,5 +1,6 @@
 import type { ParsedSegment } from '../types/scan.types.js'
 import { SegmentSyntaxError } from '../errors/syntax.error.js'
+import { parseParamType } from './paramTypeParser.js'
 
 export function parseSegment(segment: string): ParsedSegment {
   const raw = segment.trim()
@@ -49,16 +50,18 @@ export function parseSegment(segment: string): ParsedSegment {
         throw new SegmentSyntaxError(`Invalid typed parameter syntax: "${raw}"`, raw)
       }
       const paramName = parts[0]!.trim()
-      const paramType = parts[1]!.trim()
+      const rawParamType = parts[1]!.trim()
 
-      if (!paramName || !paramType) {
+      if (!paramName || !rawParamType) {
         throw new SegmentSyntaxError(`Invalid typed parameter syntax: "${raw}"`, raw)
       }
+
+      const { paramType, pattern } = parseParamType(rawParamType, raw)
 
       return {
         raw,
         type: 'typed-dynamic',
-        value: `:${paramName}`,
+        value: `:${paramName}${pattern}`,
         paramName,
         paramType,
       }

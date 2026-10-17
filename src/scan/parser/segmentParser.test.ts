@@ -85,30 +85,28 @@ describe('parseSegment', () => {
     expect(() => parseSegment('[   ]')).toThrow(SegmentSyntaxError)
   })
 
-  it('parses typed dynamic segments [id::type]', () => {
+  it('parses typed dynamic segments [id::number]', () => {
     expect(parseSegment('[id::number]')).toEqual({
       raw: '[id::number]',
       type: 'typed-dynamic',
-      value: ':id',
+      value: ':id(\\d+)',
       paramName: 'id',
       paramType: 'number',
     })
 
-    expect(parseSegment('[code::uuid]')).toEqual({
-      raw: '[code::uuid]',
+    expect(parseSegment('[USER_ID::NUMBER]')).toEqual({
+      raw: '[USER_ID::NUMBER]',
       type: 'typed-dynamic',
-      value: ':code',
-      paramName: 'code',
-      paramType: 'uuid',
+      value: ':user_id(\\d+)',
+      paramName: 'user_id',
+      paramType: 'number',
     })
+  })
 
-    expect(parseSegment('[IS_ACTIVE::BOOLEAN]')).toEqual({
-      raw: '[IS_ACTIVE::BOOLEAN]',
-      type: 'typed-dynamic',
-      value: ':is_active',
-      paramName: 'is_active',
-      paramType: 'boolean',
-    })
+  it('rejects unsupported parameter types with SegmentSyntaxError', () => {
+    expect(() => parseSegment('[code::uuid]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[is_active::boolean]')).toThrow(SegmentSyntaxError)
+    expect(() => parseSegment('[name::string]')).toThrow(SegmentSyntaxError)
   })
 
   it('throws SegmentSyntaxError on malformed typed dynamic segments', () => {

@@ -91,7 +91,7 @@ describe('validateDiscoveredFiles', () => {
   it('throws RouteConflictError on sibling typed-dynamic segments collision', () => {
     const files = buildDiscovered([
       'users/[id::number]/get.ts',
-      'users/[slug::string]/post.ts',
+      'users/[userId::number]/post.ts',
     ])
 
     expect(() => validateDiscoveredFiles(files)).toThrow(RouteConflictError)

@@ -31,7 +31,7 @@ describe('parseFile', () => {
       },
       segments: [
         { raw: 'users', type: 'static', value: 'users' },
-        { raw: '[id::number]', type: 'typed-dynamic', value: ':id', paramName: 'id', paramType: 'number' },
+        { raw: '[id::number]', type: 'typed-dynamic', value: ':id(\\d+)', paramName: 'id', paramType: 'number' },
         { raw: 'posts', type: 'static', value: 'posts' },
         { raw: '[slug]', type: 'dynamic', value: ':slug', paramName: 'slug' },
       ],
