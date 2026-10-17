@@ -1,4 +1,4 @@
-import { readBody, getCookie, setCookie, deleteCookie, getQuery, redirect, getRequestIP, type H3Event } from 'h3'
+import { readBody, getCookie, setCookie, deleteCookie, getQuery, getRequestIP, type H3Event } from 'h3'
 
 // TODO(0.2.0): state
 // import { XantoStateManager } from './stateManager.js'
@@ -108,10 +108,6 @@ export async function createContext // <TState extends Record<string, unknown>>
     deleteCookie(name, options) {
       deleteCookie(event, name, options as any)
       return this
-    },
-
-    redirect(location, statusCode) {
-      return redirect(location, statusCode)
     },
   }
 

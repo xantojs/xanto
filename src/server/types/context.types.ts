@@ -27,7 +27,6 @@ export interface BaseContext<
   getCookie(name: string): string | undefined
   setCookie(name: string, value: string, options?: CookieOptions): this
   deleteCookie(name: string, options?: CookieOptions): this
-  redirect(location: string, statusCode?: number): void
 
   // readonly state: StateManager<TState>
 }
