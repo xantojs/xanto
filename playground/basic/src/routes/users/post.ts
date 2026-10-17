@@ -1,4 +1,4 @@
-import { POST } from '@xanto/core/routing'
+import { POST } from '@xanto/core/server/routing'
 
 export default POST({
   handler() {},
