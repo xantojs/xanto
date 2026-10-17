@@ -9,6 +9,9 @@ export function reply(status: number, body?: unknown): Response {
       },
     })
   }
+  if (body instanceof Blob || body instanceof ReadableStream || body instanceof ArrayBuffer || ArrayBuffer.isView(body)) {
+    return new Response(body as BodyInit, { status })
+  }
   return Response.json(body, { status })
 }
 
