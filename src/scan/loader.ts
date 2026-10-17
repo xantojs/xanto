@@ -24,38 +24,36 @@ export async function loadFiles(
   const imported = await importModules(filePaths)
 
   const moduleMap = new Map<string, any>()
-  for (let i = 0; i < imported.length; i++) {
-    const item = imported[i]!
-    if (!item.error && item.module) {
-      moduleMap.set(item.file, item.module)
+  for (const item of imported) {
+    if (item.error) {
+      throw new ScanError(`Failed to import ${item.file}: ${String(item.error)}`)
     }
+    if (item.module) moduleMap.set(item.file, item.module)
   }
 
   const routes: ParsedRoute[] = []
 
-  for (let i = 0; i < scannedRoutes.length; i++) {
-    const scanned = scannedRoutes[i]!
-    const mod = moduleMap.get(scanned.filePath)
+  for (const scanned of scannedRoutes) {
+    const def = moduleMap.get(scanned.filePath)?.default
 
-    if (!mod || !mod.default) {
-      continue
+    if (!def || typeof def !== 'object' || typeof def.handler !== 'function') {
+      throw new ScanError(
+        `Invalid default export in ${scanned.filePath}: expected a route created with route()`
+      )
     }
 
-    const routeDef = mod.default
-    if (routeDef && typeof routeDef === 'object' && 'method' in routeDef) {
-      if (routeDef.method !== scanned.method) {
-        throw new ScanError(`Method mismatch in ${scanned.filePath}: filename defines ${scanned.method}, but route handler defines ${routeDef.method}`)
-      }
+    if (def.method !== scanned.method) {
+      throw new ScanError(
+        `Method mismatch in ${scanned.filePath}: filename defines ${scanned.method}, but route handler defines ${def.method}`
+      )
     }
 
     routes.push({
       path: scanned.path,
       method: scanned.method,
-      schema: routeDef?.schema,
-      handler: typeof routeDef?.handler === 'function' ? routeDef.handler : routeDef,
+      schema: def.schema,
+      handler: def.handler,
     })
-
-    console.log(`✅ [${scanned.method}] ${scanned.path}`)
   }
 
   return routes
