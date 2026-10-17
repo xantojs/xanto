@@ -107,7 +107,7 @@ export async function createContext<TState extends Record<string, unknown>>(
     },
 
     redirect(location, statusCode) {
-      redirect(location, statusCode)
+      return redirect(location, statusCode)
     },
   }
 
