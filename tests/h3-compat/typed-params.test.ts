@@ -19,3 +19,23 @@ describe('typed param fallback', () => {
     })
   }
 })
+
+describe('typed param regex edge cases', () => {
+  const cases: Array<[string, number]> = [
+    ['/users/123', 200],
+    ['/users/0', 200],
+    ['/users/12abc', 404],
+    ['/users/-5', 404],
+    ['/users/3.14', 404],
+    ['/users/', 404],
+  ]
+
+  for (const [path, status] of cases) {
+    it(`${path} -> ${status}`, async () => {
+      const app = new H3()
+      app.get('/users/:id(\\d+)', () => 'number')
+      const res = await app.fetch(new Request(`http://localhost${path}`))
+      expect(res.status).toBe(status)
+    })
+  }
+})
