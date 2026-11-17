@@ -31,23 +31,20 @@ export async function createContext // <TState extends Record<string, unknown>>
   const rawHeaders = Object.fromEntries(event.req.headers.entries())
   const rawParams = event.context.params || {}
 
-  let rawBody: unknown = undefined
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(event.req.method)) {
-    try {
-      rawBody = await readBody(event)
-    } catch {
-      rawBody = undefined
-    }
-  }
+  const canReadBody = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(event.req.method)
+  const rawBody = canReadBody ? await readBody(event) : undefined
 
-  const bodySchema = (schema as import('../types/routing.types.js').BodyRouteSchema | undefined)?.body
+  const bodySchema = canReadBody
+    ? (schema as import('../types/routing.types.js').BodyRouteSchema | undefined)?.body
+    : undefined
   //const state = getOrCreateState<TState>(event)
+
 
   const [query, params, headers, body] = await Promise.all([
     schema?.query ? validateSchema(schema.query, rawQuery) : Promise.resolve(rawQuery),
     schema?.params ? validateSchema(schema.params, rawParams) : Promise.resolve(rawParams),
     schema?.headers ? validateSchema(schema.headers, rawHeaders) : Promise.resolve(rawHeaders),
-    bodySchema && rawBody !== undefined ? validateSchema(bodySchema, rawBody) : Promise.resolve(rawBody),
+    bodySchema ? validateSchema(bodySchema, rawBody) : Promise.resolve(rawBody),
   ])
 
   /* if (schema?.state) {

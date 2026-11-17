@@ -184,11 +184,12 @@ describe('createContext', () => {
     expect(h3Mocks.readBody).not.toHaveBeenCalled()
   })
 
-  it('body is undefined on ctx when readBody throws', async () => {
-    vi.mocked(h3Mocks.readBody).mockRejectedValue(new Error('parse error'))
-    const ctx = await createContext(makeEvent({ method: 'POST' }))
-    expect((ctx as any).body).toBeUndefined()
-  })
+it('propagates errors from readBody', async () => {
+  const error = new Error('parse error')
+  vi.mocked(h3Mocks.readBody).mockRejectedValueOnce(error)
+
+  await expect(createContext(makeEvent({ method: 'POST' }))).rejects.toBe(error)
+})
 
   it('body is frozen when present', async () => {
     vi.mocked(h3Mocks.readBody).mockResolvedValue({ x: 1 })
