@@ -1,7 +1,7 @@
 import { createInitialState, createOptionalMethods, handleOptional } from '../core/state.js'
 import { createStandardSchema } from '../core/standard.js'
 
-import type { StandardSchemaV1, InferInput, InferOutput } from '../../types/schema.types.js'
+import type { StandardSchemaV1, StandardIssue, InferInput, InferOutput } from '../../types/schema.types.js'
 import type { ChainState } from '../types/chainState.types.js'
 import type { XantoRecordSchema } from '../types/chain.types.js'
 
@@ -17,26 +17,42 @@ function build<K extends StandardSchemaV1, V extends StandardSchemaV1>(
 
     const record = value as Record<string, unknown>
     const output: Record<string, unknown> = {}
-    const issues: { message: string; path?: (string | number)[] }[] = []
+    const issues: StandardIssue[] = []
 
     for (const [key, val] of Object.entries(record)) {
       const keyResult = await keySchema['~standard'].validate(key)
       const valueResult = await valueSchema['~standard'].validate(val)
 
-      if ('issues' in keyResult && keyResult.issues) {
-        for (const issue of keyResult.issues) {
-          issues.push({ message: issue.message, path: [key, ...((issue.path ?? []) as (string | number)[])] })
-        }
-      }
-      if ('issues' in valueResult && valueResult.issues) {
-        for (const issue of valueResult.issues) {
-          issues.push({ message: issue.message, path: [key, ...((issue.path ?? []) as (string | number)[])] })
-        }
+      for (const issue of keyResult.issues ?? []) {
+        issues.push({ message: issue.message, path: [key, ...(issue.path ?? [])] })
       }
 
-      if ('value' in keyResult && 'value' in valueResult) {
-        output[keyResult.value as string] = valueResult.value
+      for (const issue of valueResult.issues ?? []) {
+        issues.push({ message: issue.message, path: [key, ...(issue.path ?? [])] })
       }
+
+      if (!('value' in keyResult) || !('value' in valueResult)) {
+        continue
+      }
+
+      const validatedKey = keyResult.value
+      if (typeof validatedKey !== 'string' && typeof validatedKey !== 'number') {
+        issues.push({ message: 'Record key must be a string or number', path: [key] })
+        continue
+      }
+
+      const outputKey = String(validatedKey)
+      if (Object.hasOwn(output, outputKey)) {
+        issues.push({ message: `Duplicate record key "${outputKey}"`, path: [key] })
+        continue
+      }
+
+      Object.defineProperty(output, outputKey, {
+        value: valueResult.value,
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      })
     }
 
     if (issues.length > 0) {

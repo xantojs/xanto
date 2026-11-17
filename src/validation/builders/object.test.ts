@@ -200,6 +200,81 @@ describe('x.object() with chaining', () => {
     })
   })
 
+  describe('own properties and validation execution', () => {
+    it.each([
+      ['passthrough key', x.object({}).passthrough()],
+      ['declared key', x.object({ ['__proto__']: x.object({ isAdmin: x.boolean() }) })],
+    ] as const)('should preserve __proto__ as an own property for a %s', async (_name, schema) => {
+      const input: unknown = JSON.parse('{"__proto__":{"isAdmin":true}}')
+      const result = await schema['~standard'].validate(input)
+
+      if (!('value' in result)) {
+        throw new Error('Expected successful validation')
+      }
+
+      expect(Object.getPrototypeOf(result.value)).toBe(Object.prototype)
+      expect(Object.hasOwn(result.value, '__proto__')).toBe(true)
+      expect(result.value['__proto__' as keyof typeof result.value]).toEqual({ isAdmin: true })
+    })
+
+    it('should apply a default when constructor is inherited', async () => {
+      const schema = x.object({
+        constructor: x.string().default('fallback'),
+      })
+
+      expect(await schema['~standard'].validate({})).toEqual({
+        value: { constructor: 'fallback' },
+      })
+    })
+
+    it('should validate nested synchronous fields without returning a promise', () => {
+      const schema = x.object({
+        user: x.object({ name: x.string() }),
+      })
+
+      const result = schema['~standard'].validate({ user: { name: 'Alex' } })
+
+      expect(result).toEqual({ value: { user: { name: 'Alex' } } })
+    })
+
+    it('should finish an async field before validating the next field', async () => {
+      const calls: string[] = []
+      const schema = x.object({
+        first: x.string(),
+        middle: {
+          '~standard': {
+            version: 1 as const,
+            vendor: 'test',
+            async validate(input: unknown) {
+              await Promise.resolve()
+              calls.push('middle')
+              return { value: input }
+            },
+          },
+        },
+        last: {
+          '~standard': {
+            version: 1 as const,
+            vendor: 'test',
+            validate(input: unknown) {
+              calls.push('last')
+              return { value: input }
+            },
+          },
+        },
+      })
+
+      const result = await schema['~standard'].validate({
+        first: 'Alex',
+        middle: 25,
+        last: true,
+      })
+
+      expect(calls).toEqual(['middle', 'last'])
+      expect(result).toEqual({ value: { first: 'Alex', middle: 25, last: true } })
+    })
+  })
+
   describe('nested coercion', () => {
     it('should coerce primitive fields inside an object', async () => {
       const schema = x.object({
@@ -253,4 +328,3 @@ describe('x.object() with chaining', () => {
     })
   })
 })
-

@@ -1,5 +1,6 @@
 import { createInitialState, createOptionalMethods, handleOptional } from '../core/state.js'
 import { createStandardSchema } from '../core/standard.js'
+import type { StandardIssue, StandardResult } from '../../types/schema.types.js'
 
 import type { ChainState } from '../types/chainState.types.js'
 import type { ObjectShape, InferObjectInput, InferObjectOutput, XantoObjectSchema, ObjectMode } from '../types/chain.types.js'
@@ -10,57 +11,88 @@ interface ObjectState<Shape extends ObjectShape> {
 }
 
 function build<Shape extends ObjectShape>(shape: Shape, state: ObjectState<Shape>): XantoObjectSchema<Shape> {
-  const validate = handleOptional<InferObjectOutput<Shape>>(state.chain, async (value) => {
+  type Output = InferObjectOutput<Shape>
+
+  const validate = handleOptional<Output>(state.chain, (value) => {
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       return {
         issues: [{ message: state.chain.message ?? 'Expected object' }],
       }
     }
 
-    const output: Record<string, unknown> = {}
-    const issues: { message: string; path?: (string | number)[] }[] = []
     const record = value as Record<string, unknown>
-    const shapeKeys = Object.keys(shape)
+    const output: Record<string, unknown> = {}
+    const issues: StandardIssue[] = []
+    const fields = Object.entries(shape)
+    const shapeKeys = state.mode === 'strip' ? undefined : new Set(fields.map(([key]) => key))
 
-    for (const [key, fieldSchema] of Object.entries(shape)) {
-      const val = record[key]
-      const fieldResult = await fieldSchema['~standard'].validate(val)
+    function writeField(key: string, value: unknown): void {
+      if (key === '__proto__') {
+        Object.defineProperty(output, key, {
+          value,
+          enumerable: true,
+          writable: true,
+          configurable: true,
+        })
+      } else {
+        output[key] = value
+      }
+    }
 
-      if ('issues' in fieldResult && fieldResult.issues) {
-        for (const issue of fieldResult.issues) {
+    function collectFieldResult(key: string, result: StandardResult<unknown>): void {
+      if (result.issues) {
+        for (const issue of result.issues) {
           issues.push({
             message: issue.message,
-            path: [key, ...((issue.path ?? []) as (string | number)[])],
+            path: [key, ...(issue.path ?? [])],
           })
         }
-      } else if ('value' in fieldResult) {
-        output[key] = fieldResult.value
+      } else {
+        writeField(key, result.value)
       }
     }
 
-    const extraKeys = Object.keys(record).filter((key) => !shapeKeys.includes(key))
-    if (extraKeys.length > 0) {
-      if (state.mode === 'strict') {
-        for (const key of extraKeys) {
-          issues.push({ message: `Unexpected key "${key}"`, path: [key] })
+    function validateFields(start: number): StandardResult<Output> | Promise<StandardResult<Output>> {
+      for (let index = start; index < fields.length; index++) {
+        const [key, fieldSchema] = fields[index]!
+        const input = Object.hasOwn(record, key) ? record[key] : undefined
+        const result = fieldSchema['~standard'].validate(input)
+
+        if ('then' in result) {
+          return Promise.resolve(result).then((resolved) => {
+            collectFieldResult(key, resolved)
+            return validateFields(index + 1)
+          })
         }
-      } else if (state.mode === 'passthrough') {
-        for (const key of extraKeys) {
-          output[key] = record[key]
+
+        collectFieldResult(key, result)
+      }
+
+      if (shapeKeys) {
+        for (const key of Object.keys(record)) {
+          if (shapeKeys.has(key)) continue
+
+          if (state.mode === 'strict') {
+            issues.push({ message: `Unexpected key "${key}"`, path: [key] })
+          } else {
+            writeField(key, record[key])
+          }
         }
       }
+
+      if (issues.length > 0) {
+        return { issues }
+      }
+
+      return { value: output as Output }
     }
 
-    if (issues.length > 0) {
-      return { issues }
-    }
-
-    return { value: output as unknown as InferObjectOutput<Shape> }
+    return validateFields(0)
   })
 
   return {
     shape,
-    ...createStandardSchema<InferObjectInput<Shape>, InferObjectOutput<Shape>>(validate),
+    ...createStandardSchema<InferObjectInput<Shape>, Output>(validate),
 
     strip: () => build(shape, { chain: state.chain, mode: 'strip' }),
     passthrough: () => build(shape, { chain: state.chain, mode: 'passthrough' }),

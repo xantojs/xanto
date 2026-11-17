@@ -59,14 +59,27 @@ export class ValidationError extends Error {
 
     for (const issue of this.issues) {
       const path = formatPath(issue.path)
+
       if (!path) {
         formErrors.push(issue.message)
-      } else {
-        if (!fieldErrors[path]) {
-          fieldErrors[path] = []
-        }
-        fieldErrors[path].push(issue.message)
+        continue
       }
+
+      let messages: string[]
+
+      if (Object.hasOwn(fieldErrors, path)) {
+        messages = fieldErrors[path]!
+      } else {
+        messages = []
+        Object.defineProperty(fieldErrors, path, {
+          value: messages,
+          enumerable: true,
+          writable: true,
+          configurable: true,
+        })
+      }
+
+      messages.push(issue.message)
     }
 
     return { formErrors, fieldErrors }

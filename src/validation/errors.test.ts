@@ -73,4 +73,19 @@ describe('ValidationError', () => {
       issues,
     })
   })
+
+  it('groups errors under special property names', () => {
+    const error = new ValidationError([
+      { message: 'first', path: ['constructor'] },
+      { message: 'second', path: ['constructor'] },
+      { message: 'third', path: ['__proto__'] },
+    ])
+
+    const { fieldErrors } = error.flatten()
+
+    expect(fieldErrors.constructor).toEqual(['first', 'second'])
+    expect(Object.hasOwn(fieldErrors, '__proto__')).toBe(true)
+    expect(fieldErrors['__proto__']).toEqual(['third'])
+    expect(Object.getPrototypeOf(fieldErrors)).toBe(Object.prototype)
+  })
 })
