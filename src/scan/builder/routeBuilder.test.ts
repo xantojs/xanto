@@ -29,6 +29,7 @@ describe('buildRoutes', () => {
       filePath: '/root/get.ts',
       params: [],
       priority: 0,
+      segments: [],
     })
   })
 
@@ -46,9 +47,7 @@ describe('buildRoutes', () => {
   })
 
   it('builds nested route with dynamic and typed parameters', () => {
-    const files = buildDiscovered([
-      'users/[id::number]/posts/[slug]/get.ts',
-    ])
+    const files = buildDiscovered(['users/[id::number]/posts/[slug]/get.ts'])
     const routes = buildRoutes(files)
 
     expect(routes).toHaveLength(1)
@@ -61,13 +60,23 @@ describe('buildRoutes', () => {
         { name: 'slug', isCatchAll: false },
       ],
       priority: 4342,
+      segments: [
+        { raw: 'users', type: 'static', value: 'users' },
+        {
+          raw: '[id::number]',
+          type: 'typed-dynamic',
+          value: ':id(\\d+)',
+          paramName: 'id',
+          paramType: 'number',
+        },
+        { raw: 'posts', type: 'static', value: 'posts' },
+        { raw: '[slug]', type: 'dynamic', value: ':slug', paramName: 'slug' },
+      ],
     })
   })
 
   it('builds route with catch-all parameter and strips group from path', () => {
-    const files = buildDiscovered([
-      '(admin)/docs/[...slug]/get.ts',
-    ])
+    const files = buildDiscovered(['(admin)/docs/[...slug]/get.ts'])
     const routes = buildRoutes(files)
 
     expect(routes).toHaveLength(1)
@@ -75,17 +84,17 @@ describe('buildRoutes', () => {
       path: '/docs/**:slug',
       method: 'GET',
       filePath: '/root/(admin)/docs/[...slug]/get.ts',
-      params: [
-        { name: 'slug', isCatchAll: true },
-      ],
+      params: [{ name: 'slug', isCatchAll: true }],
       priority: 41,
+      segments: [
+        { raw: 'docs', type: 'static', value: 'docs' },
+        { raw: '[...slug]', type: 'catch-all', value: '**:slug', paramName: 'slug' },
+      ],
     })
   })
 
   it('handles multiple nested route groups cleanly without polluting path', () => {
-    const files = buildDiscovered([
-      '(marketing)/(v1)/(public)/pricing/get.ts',
-    ])
+    const files = buildDiscovered(['(marketing)/(v1)/(public)/pricing/get.ts'])
     const routes = buildRoutes(files)
 
     expect(routes).toHaveLength(1)
@@ -107,40 +116,24 @@ describe('buildRoutes', () => {
 
     const profileRoute = routes.find((r) => r.path === '/users/profile')
     expect(profileRoute).toBeDefined()
-    expect(profileRoute?.middlewares).toEqual([
-      '/root/middleware.ts',
-      '/root/users/middleware.ts',
-    ])
+    expect(profileRoute?.middlewares).toEqual(['/root/middleware.ts', '/root/users/middleware.ts'])
     expect(profileRoute?.errorHandler).toBe('/root/users/profile/error.ts')
 
     const settingsRoute = routes.find((r) => r.path === '/users/profile/settings')
     expect(settingsRoute).toBeDefined()
-    expect(settingsRoute?.middlewares).toEqual([
-      '/root/middleware.ts',
-      '/root/users/middleware.ts',
-    ])
+    expect(settingsRoute?.middlewares).toEqual(['/root/middleware.ts', '/root/users/middleware.ts'])
     expect(settingsRoute?.errorHandler).toBe('/root/users/profile/error.ts')
   })
 
   it('isolates middlewares and errors inside route groups', () => {
-    const files = buildDiscovered([
-      'middleware.ts',
-      '(admin)/middleware.ts',
-      '(admin)/dashboard/get.ts',
-      '(public)/login/get.ts',
-    ])
+    const files = buildDiscovered(['middleware.ts', '(admin)/middleware.ts', '(admin)/dashboard/get.ts', '(public)/login/get.ts'])
     const routes = buildRoutes(files)
 
     const dashboard = routes.find((r) => r.path === '/dashboard')
     const login = routes.find((r) => r.path === '/login')
 
-    expect(dashboard?.middlewares).toEqual([
-      '/root/middleware.ts',
-      '/root/(admin)/middleware.ts',
-    ])
-    expect(login?.middlewares).toEqual([
-      '/root/middleware.ts',
-    ])
+    expect(dashboard?.middlewares).toEqual(['/root/middleware.ts', '/root/(admin)/middleware.ts'])
+    expect(login?.middlewares).toEqual(['/root/middleware.ts'])
   })
 
   it('sorts routes by priority score descending', () => {
@@ -153,12 +146,7 @@ describe('buildRoutes', () => {
     const routes = buildRoutes(files)
 
     const paths = routes.map((r) => r.path)
-    expect(paths).toEqual([
-      '/users/settings',
-      '/users/:id(\\d+)',
-      '/users/:id',
-      '/users/**:slug',
-    ])
+    expect(paths).toEqual(['/users/settings', '/users/:id(\\d+)', '/users/:id', '/users/**:slug'])
 
     expect(routes[0]?.priority).toBeGreaterThan(routes[1]?.priority!)
     expect(routes[1]?.priority).toBeGreaterThan(routes[2]?.priority!)

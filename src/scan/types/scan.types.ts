@@ -1,16 +1,9 @@
 import type { Methods } from '../../types/methods.types.js'
+import type { ParsedSegment } from '../../types/segment.types.js'
+
+export type { ParsedSegment, SegmentType } from '../../types/segment.types.js'
 
 export type FileKind = 'route' | 'middleware' | 'error'
-
-export type SegmentType = 'static' | 'dynamic' | 'typed-dynamic' | 'catch-all' | 'group'
-
-export interface ParsedSegment {
-  raw: string
-  type: SegmentType
-  value: string | null
-  paramName?: string
-  paramType?: string
-}
 
 export interface ParsedFilename {
   raw: string

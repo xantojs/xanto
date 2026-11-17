@@ -51,14 +51,8 @@ export function buildRoutes(files: DiscoveredFile[]): ScannedRoute[] {
 
   const scannedRoutes: ScannedRoute[] = []
 
-  function traverse(
-    node: RouteTreeNode,
-    inheritedMiddlewares: string[],
-    inheritedErrorHandler: string | null
-  ) {
-    const currentMiddlewares = node.middlewarePath
-      ? [...inheritedMiddlewares, node.middlewarePath]
-      : inheritedMiddlewares
+  function traverse(node: RouteTreeNode, inheritedMiddlewares: string[], inheritedErrorHandler: string | null) {
+    const currentMiddlewares = node.middlewarePath ? [...inheritedMiddlewares, node.middlewarePath] : inheritedMiddlewares
 
     const currentErrorHandler = node.errorPath ?? inheritedErrorHandler
 
@@ -101,6 +95,7 @@ export function buildRoutes(files: DiscoveredFile[]): ScannedRoute[] {
         method: filename.method,
         filePath,
         params,
+        segments: segments.filter((segment) => segment.type !== 'group'),
         priority: priorityScore,
       }
 

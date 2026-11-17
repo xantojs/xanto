@@ -47,6 +47,7 @@ export async function loadFiles(routesDir: string = 'routes', basePath: string =
       method: scanned.method,
       schema: def.schema,
       handler: def.handler,
+      segments: scanned.segments,
       ...(scanned.params.length > 0 && { params: scanned.params }),
       ...(scanned.middlewares && { middlewares: scanned.middlewares }),
       ...(scanned.errorHandler && { errorHandler: scanned.errorHandler }),
